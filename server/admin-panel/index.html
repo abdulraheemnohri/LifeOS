@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeOS Admin Panel</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="glass-container">
+        <h1>LifeOS Sync Enterprise Admin</h1>
+
+        <div id="login-section">
+            <h2>Admin Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+        </div>
+
+        <div id="admin-section" style="display:none;">
+            <div class="tabs">
+                <button onclick="showTab('users-tab')">User Management</button>
+                <button onclick="showTab('update-tab')">System Update</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+
+            <div id="users-tab" class="tab-content">
+                <h3>Create User</h3>
+                <input type="text" id="new-username" placeholder="New Username">
+                <input type="password" id="new-password" placeholder="New Password">
+                <select id="new-role">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button onclick="createUser()">Create User</button>
+
+                <h3>Users List</h3>
+                <div id="users-list"></div>
+            </div>
+
+            <div id="update-tab" class="tab-content" style="display:none;">
+                <h3>Trigger Server Update</h3>
+                <button onclick="updateServer()">Update Server (git pull + npm install)</button>
+                <pre id="update-log"></pre>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
