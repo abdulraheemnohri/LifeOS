@@ -55,30 +55,73 @@ GitHub (version.json updates)
 
 ## 🚀 INSTALLATION & RUNNING
 
-### 1. Prerequisites
-- Node.js (v14+)
-- npm
+### 1. Prerequisites (All Platforms)
+- Node.js (v16+)
+- npm / yarn
+- Git
 
-### 2. Server Setup
-```bash
-# From the project root:
-cd server
-npm install
-cp .env.example .env
-```
+### 2. Platform-Specific Setup
 
-### 3. Running the Server
+#### 🪟 Windows (Command Prompt / PowerShell)
+1. Install Node.js from [nodejs.org](https://nodejs.org/).
+2. Clone the repository:
+   ```cmd
+   git clone https://github.com/abdulraheemnohri/LifeOS.git
+   cd LifeOS
+   ```
+3. Setup Server:
+   ```cmd
+   cd server
+   npm install
+   copy .env.example .env
+   ```
+4. Run Server:
+   ```cmd
+   node app.js
+   ```
+
+#### 🐧 Linux (Ubuntu/Debian/CentOS)
+1. Install Node.js:
+   ```bash
+   sudo apt update
+   sudo apt install nodejs npm -y
+   ```
+2. Clone & Setup:
+   ```bash
+   git clone https://github.com/abdulraheemnohri/LifeOS.git
+   cd LifeOS/server
+   npm install
+   cp .env.example .env
+   ```
+3. Run Server:
+   ```bash
+   node app.js
+   ```
+
+#### 📱 Termux (Android)
+1. Install Termux from F-Droid.
+2. Update packages and install Node.js:
+   ```bash
+   pkg update && pkg upgrade
+   pkg install git nodejs-lts -y
+   ```
+3. Clone & Setup:
+   ```bash
+   git clone https://github.com/abdulraheemnohri/LifeOS.git
+   cd LifeOS/server
+   npm install
+   cp .env.example .env
+   ```
+4. Run Server:
+   ```bash
+   node app.js
+   ```
+
+### 3. Running Backend Tests
 ```bash
 # From the server directory:
-node app.js
-# Or using npm start (if configured):
-npm start
-```
-The server will start on `http://localhost:3000`.
-
-### 4. Running Backend Tests
-```bash
-# From the server directory:
+npm test
+# OR
 ./node_modules/.bin/jest
 ```
 
