@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeOS Sync Enterprise</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Login View -->
+        <div id="login-view" class="glass-card">
+            <h1>LifeOS Login</h1>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <input type="text" id="server-ip" placeholder="Server URL (e.g., http://localhost:3000)">
+            <button onclick="login()">Login</button>
+        </div>
+
+        <!-- Dashboard View (Initially Hidden) -->
+        <div id="main-view" style="display:none;">
+            <nav class="glass-nav">
+                <button onclick="showSection('dashboard')">📊 Dash</button>
+                <button onclick="showSection('income')">💰 Income</button>
+                <button onclick="showSection('bills')">🧾 Bills</button>
+                <button onclick="showSection('loans')">🤝 Loans</button>
+                <button onclick="showSection('notes')">📝 Notes</button>
+                <button onclick="showSection('experience')">📘 Experience</button>
+                <button onclick="logout()">🚪 Logout</button>
+            </nav>
+
+            <div id="content-area">
+                <!-- Sections will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Notification Modal -->
+    <div id="update-modal" class="modal" style="display:none;">
+        <div class="modal-content glass-card">
+            <h2>New Version Available!</h2>
+            <p id="update-version"></p>
+            <p id="update-message"></p>
+            <button id="update-btn">Update Now</button>
+            <button onclick="closeUpdateModal()">Later</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="storage.js"></script>
+    <script src="api.js"></script>
+    <script src="sync.js"></script>
+    <script src="components/dashboard.js"></script>
+    <script src="components/income.js"></script>
+    <script src="components/bills.js"></script>
+    <script src="components/loans.js"></script>
+    <script src="components/notes.js"></script>
+    <script src="components/experience.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
