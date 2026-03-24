@@ -4,10 +4,28 @@ const SettingsComponent = {
         const serverUrl = localStorage.getItem('lifeos_server_url') || '';
         const user = JSON.parse(localStorage.getItem('lifeos_user')) || {};
 
+        const isLocal = localStorage.getItem('lifeos_mode') === 'local';
+
         return `
             <div class="glass-card">
                 <h1>⚙️ App Settings</h1>
+
+                ${isLocal ? `
                 <div class="card">
+                    <h3>Switch to Cloud Mode</h3>
+                    <p>Current: Local Mode (Offline Only)</p>
+                    <button onclick="showServerView()" style="background:var(--primary)">Connect to Cloud</button>
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>Security (Local)</h3>
+                    <p>Change your offline access password.</p>
+                    <input type="password" id="new-local-pass" placeholder="New Local Password">
+                    <button onclick="SettingsComponent.saveLocalPass()">Update Local Password</button>
+                </div>
+                ` : ''}
+
+                <div class="card" style="margin-top: 2rem;">
                     <h3>Sync Settings</h3>
                     <p>Current Sync Frequency: ${syncFreq / 1000}s</p>
                     <select id="setting-sync-freq">
@@ -34,6 +52,12 @@ const SettingsComponent = {
                 </div>
             </div>
         `;
+    },
+    saveLocalPass: () => {
+        const val = document.getElementById('new-local-pass').value;
+        if (!val) return alert('Please enter a password');
+        localStorage.setItem('lifeos_local_password', val);
+        alert('Local password updated.');
     },
     saveSyncFreq: () => {
         const val = document.getElementById('setting-sync-freq').value;

@@ -24,9 +24,13 @@ const DashboardComponent = {
             });
         }, 100);
 
+        const user = JSON.parse(localStorage.getItem('lifeos_user')) || {};
         return `
             <div class="glass-card">
-                <h1>Dashboard</h1>
+                <div class="section-header">
+                    <h1>Dashboard</h1>
+                    <span>Welcome, ${user.username}</span>
+                </div>
                 <div class="grid">
                     <div class="card" style="border-left: 5px solid var(--primary)">
                         <h3>Income</h3>

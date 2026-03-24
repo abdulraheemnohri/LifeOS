@@ -3,7 +3,11 @@ const Sync = {
     lastSyncTime: localStorage.getItem('lifeos_last_sync_time'),
 
     performSync: async () => {
-        if (Sync.isSyncing || !navigator.onLine) return;
+        const isLocal = localStorage.getItem('lifeos_mode') === 'local';
+        const serverUrl = localStorage.getItem('lifeos_server_url');
+
+        if (isLocal || !serverUrl || Sync.isSyncing || !navigator.onLine) return;
+
         Sync.isSyncing = true;
         console.log('Syncing starting...');
 

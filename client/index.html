@@ -12,8 +12,20 @@
     </div>
 
     <div id="app-container">
-        <!-- Step 1: Server Connection -->
-        <div id="server-view" class="glass-card login-card">
+        <!-- Step 1: Mode Selection -->
+        <div id="mode-view" class="glass-card login-card">
+            <div class="logo">
+                <div class="logo-icon">🚀</div>
+                <span>LifeOS<span>Sync</span></span>
+            </div>
+            <h2>Get Started</h2>
+            <p>Choose how you want to use LifeOS</p>
+            <button onclick="showServerView()">Connect to Cloud (Backup & Sync)</button>
+            <button onclick="useLocally()" class="btn-secondary">Work Locally (Offline Only)</button>
+        </div>
+
+        <!-- Step 2: Server Connection -->
+        <div id="server-view" class="glass-card login-card" style="display:none;">
             <div class="logo">
                 <div class="logo-icon">🚀</div>
                 <span>LifeOS<span>Sync</span></span>
@@ -22,23 +34,28 @@
             <p>Enter your enterprise server address to begin.</p>
             <input type="text" id="server-ip" placeholder="https://your-server.com">
             <button onclick="connectServer()">Connect</button>
+            <button onclick="showModeView()" class="btn-secondary">Back</button>
         </div>
 
-        <!-- Step 2: Login View -->
+        <!-- Step 3: Login View (Cloud or Local) -->
         <div id="login-view" class="glass-card login-card" style="display:none;">
             <div class="logo">
                 <div class="logo-icon">🚀</div>
                 <span>LifeOS<span>Sync</span></span>
             </div>
-            <h2>Welcome Back</h2>
-            <p>Login to your account</p>
-            <input type="text" id="username" placeholder="Username">
+            <h2 id="login-title">Welcome Back</h2>
+            <p id="login-desc">Login to your account</p>
+
+            <div id="cloud-login-fields">
+                <input type="text" id="username" placeholder="Username">
+            </div>
             <input type="password" id="password" placeholder="Password">
+
             <label class="checkbox-container">
                 <input type="checkbox" id="remember-me" checked> Remember Me
             </label>
-            <button onclick="login()">Login</button>
-            <button onclick="showServerView()" class="btn-secondary">Change Server</button>
+            <button onclick="handleLogin()" id="login-btn">Login</button>
+            <button onclick="showModeView()" class="btn-secondary">Change Mode</button>
         </div>
 
         <!-- Dashboard View (Initially Hidden) -->
