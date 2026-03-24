@@ -1,6 +1,6 @@
 const API = {
     getBaseUrl: () => localStorage.getItem('lifeos_server_url') || '',
-    getToken: () => localStorage.getItem('lifeos_token'),
+    getToken: () => localStorage.getItem('lifeos_token') || sessionStorage.getItem('lifeos_token'),
 
     request: async (path, options = {}) => {
         const baseUrl = API.getBaseUrl();
