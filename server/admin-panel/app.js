@@ -85,6 +85,27 @@ async function deleteUser(id) {
   if (res.ok) loadUsers();
 }
 
+async function resetUserPassword() {
+  const userId = document.getElementById('reset-user-id').value;
+  const newPassword = document.getElementById('reset-new-password').value;
+
+  const res = await fetch('/api/admin/reset-password', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ userId, newPassword })
+  });
+
+  if (res.ok) {
+    alert('Password reset successful');
+  } else {
+    const data = await res.json();
+    alert(data.message);
+  }
+}
+
 async function checkUpdate() {
   const res = await fetch('/api/update/check', {
     headers: { 'Authorization': `Bearer ${token}` }

@@ -18,7 +18,7 @@ const IncomeComponent = {
                     ${data.map(item => `
                         <div class="card">
                             <h3>${item.name}</h3>
-                            <p style="font-size: 1.5rem; color: var(--primary)">$${parseFloat(item.amount).toFixed(2)}</p>
+                            <p style="font-size: 1.5rem; color: var(--primary)">${formatCurrency(item.amount)}</p>
                             <small>${item.date}</small>
                             <button onclick="IncomeComponent.delete('${item.id}')" class="delete-btn" style="width:auto; margin-top:1rem;">Delete</button>
                         </div>

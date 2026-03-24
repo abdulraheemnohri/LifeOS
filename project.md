@@ -175,6 +175,8 @@ client/
 **🔎 CLIENT UPDATE CHECK**
 - On app load
 - Every 1 hour
+- Powered by Service Workers for background asset updates
+- Fetched directly from GitHub raw URL
 
 ---
 

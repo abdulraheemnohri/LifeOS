@@ -26,6 +26,18 @@ const SettingsComponent = {
                 ` : ''}
 
                 <div class="card" style="margin-top: 2rem;">
+                    <h3>Display Settings</h3>
+                    <p>Primary Currency</p>
+                    <select id="setting-currency">
+                        <option value="USD" ${localStorage.getItem('lifeos_currency') === 'USD' ? 'selected' : ''}>USD ($)</option>
+                        <option value="PKR" ${localStorage.getItem('lifeos_currency') === 'PKR' ? 'selected' : ''}>PKR (Rs.)</option>
+                        <option value="EUR" ${localStorage.getItem('lifeos_currency') === 'EUR' ? 'selected' : ''}>EUR (€)</option>
+                        <option value="GBP" ${localStorage.getItem('lifeos_currency') === 'GBP' ? 'selected' : ''}>GBP (£)</option>
+                    </select>
+                    <button onclick="SettingsComponent.saveCurrency()">Save Currency Preference</button>
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
                     <h3>Sync Settings</h3>
                     <p>Current Sync Frequency: ${syncFreq / 1000}s</p>
                     <select id="setting-sync-freq">
@@ -52,6 +64,12 @@ const SettingsComponent = {
                 </div>
             </div>
         `;
+    },
+    saveCurrency: () => {
+        const val = document.getElementById('setting-currency').value;
+        localStorage.setItem('lifeos_currency', val);
+        alert('Currency preference saved.');
+        renderCurrentSection();
     },
     saveLocalPass: () => {
         const val = document.getElementById('new-local-pass').value;

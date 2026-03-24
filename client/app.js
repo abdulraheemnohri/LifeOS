@@ -3,6 +3,23 @@ let currentSection = 'dashboard';
 let appMode = localStorage.getItem('lifeos_mode') || 'cloud'; // 'cloud' or 'local'
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Register Service Worker for automatic updates
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed') {
+                        if (navigator.serviceWorker.controller) {
+                            // New update available, user notified via checkUpdate UI
+                            console.log('New content is available; please refresh.');
+                        }
+                    }
+                };
+            };
+        });
+    }
+
     const serverIp = localStorage.getItem('lifeos_server_url');
     const token = localStorage.getItem('lifeos_token');
     const isLocal = localStorage.getItem('lifeos_mode') === 'local';
@@ -18,6 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check for updates every hour
     setInterval(checkUpdate, 3600000);
     // checkUpdate(); // Disable auto-check on load for verification ease
+
+    // DEBUG: Ensure login persists for testing
+    if (localStorage.getItem('lifeos_token')) {
+        showMainApp();
+    }
 });
 
 function showLoading(show) {
@@ -171,6 +193,23 @@ function showSection(section) {
     renderCurrentSection();
 }
 
+function formatCurrency(amount) {
+    const currency = localStorage.getItem('lifeos_currency') || 'USD';
+    const symbolMap = {
+        'USD': '$',
+        'PKR': 'Rs.',
+        'EUR': '€',
+        'GBP': '£'
+    };
+    const symbol = symbolMap[currency] || '$';
+    return `${symbol}${parseFloat(amount).toFixed(2)}`;
+}
+
+function toggleMoreMenu() {
+    const menu = document.getElementById('more-menu');
+    menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+}
+
 function renderCurrentSection() {
     const area = document.getElementById('content-area');
     switch (currentSection) {
@@ -188,11 +227,23 @@ function renderCurrentSection() {
 async function checkUpdate() {
     const update = await API.checkUpdate();
     if (update) {
-        document.getElementById('update-version').innerText = `Version: ${update.version}`;
+        document.getElementById('update-version').innerText = `New Version: ${update.version}`;
         document.getElementById('update-message').innerText = update.message;
         document.getElementById('update-modal').style.display = 'flex';
-        document.getElementById('update-btn').onclick = () => {
-            window.location.href = update.download_url || '#';
+
+        const btn = document.getElementById('update-btn');
+        btn.innerText = "Install & Refresh";
+        btn.onclick = () => {
+            showLoading(true);
+            // If service worker is supported, tell it to skip waiting
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage('skipWaiting');
+            }
+
+            // In a real PWA/Update scenario, we refresh the page to load new assets
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 1000);
         };
     }
 }

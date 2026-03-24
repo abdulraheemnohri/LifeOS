@@ -7,7 +7,7 @@ LifeOS Sync Enterprise is a full-stack, offline-first SaaS for managing personal
 - **Client app** with modern UI (Glass UI, Dark theme, Smooth animations)
 - **Local storage + background sync** (Offline-first)
 - **Central server (SQLite)**
-- **GitHub-based update system** (mocked)
+- **GitHub-based update system** (Automatic client updates via Service Workers)
 
 ## 🏗️ SYSTEM ARCHITECTURE
 ```
