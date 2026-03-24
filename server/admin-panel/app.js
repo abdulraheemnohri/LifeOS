@@ -108,3 +108,10 @@ async function updateServer() {
   const data = await res.json();
   document.getElementById('update-log').textContent = JSON.stringify(data, null, 2);
 }
+
+function saveSysSettings() {
+  const name = document.getElementById('sys-name').value;
+  const maint = document.getElementById('sys-maint').value;
+  alert(`Settings Saved!\nName: ${name}\nMaintenance: ${maint}`);
+  // In a real app, this would be a PUT /api/admin/settings
+}

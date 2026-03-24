@@ -10,6 +10,9 @@ db.serialize(() => {
     username TEXT UNIQUE,
     password TEXT,
     role TEXT DEFAULT 'user',
+    full_name TEXT,
+    email TEXT,
+    bio TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   )`);
 

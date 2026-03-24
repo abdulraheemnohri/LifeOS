@@ -43,6 +43,16 @@ const API = {
 
     pullSync: (lastSync) => API.request(`/api/sync/pull?lastSync=${lastSync || ''}`),
 
+    changePassword: (currentPassword, newPassword) => API.request('/api/auth/change-password', {
+        method: 'PUT',
+        body: JSON.stringify({ currentPassword, newPassword })
+    }),
+
+    updateProfile: (profileData) => API.request('/api/auth/profile', {
+        method: 'PUT',
+        body: JSON.stringify(profileData)
+    }),
+
     checkUpdate: async () => {
         // In real app, this would be a version.json on GitHub
         // For simulation, we'll return a mock version if not matched

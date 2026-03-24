@@ -60,6 +60,8 @@ function renderCurrentSection() {
         case 'loans': area.innerHTML = LoansComponent.render(); break;
         case 'notes': area.innerHTML = NotesComponent.render(); break;
         case 'experience': area.innerHTML = ExperienceComponent.render(); break;
+        case 'profile': area.innerHTML = ProfileComponent.render(); break;
+        case 'settings': area.innerHTML = SettingsComponent.render(); break;
     }
 }
 

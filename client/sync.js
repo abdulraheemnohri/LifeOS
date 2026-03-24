@@ -38,8 +38,13 @@ const Sync = {
     },
 
     initAutoSync: () => {
-        // Every 30 seconds
-        setInterval(Sync.performSync, 30000);
+        // Clear any existing sync interval
+        if (Sync.syncInterval) clearInterval(Sync.syncInterval);
+
+        const freq = parseInt(localStorage.getItem('lifeos_sync_freq') || '30000');
+
+        // Set new interval
+        Sync.syncInterval = setInterval(Sync.performSync, freq);
 
         // When coming online
         window.addEventListener('online', Sync.performSync);
