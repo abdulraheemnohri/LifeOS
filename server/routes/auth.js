@@ -8,6 +8,9 @@ const config = require('../config/config');
 // POST /api/auth/login
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password are required' });
+  }
 
   db.get('SELECT * FROM users WHERE username = ?', [username], (err, user) => {
     if (err) return res.status(500).json({ message: 'Server error' });

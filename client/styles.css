@@ -68,6 +68,14 @@ button:hover {
     transform: translateY(-2px);
 }
 
+.glass-card, .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover, .card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
 .modal {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
