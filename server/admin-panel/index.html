@@ -39,6 +39,10 @@
             </div>
 
             <div id="update-tab" class="tab-content" style="display:none;">
+                <h3>Check for Updates</h3>
+                <button onclick="checkUpdate()">Check for Updates</button>
+                <div id="update-info"></div>
+
                 <h3>Trigger Server Update</h3>
                 <button onclick="updateServer()">Update Server (git pull + npm install)</button>
                 <pre id="update-log"></pre>

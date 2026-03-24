@@ -85,6 +85,21 @@ async function deleteUser(id) {
   if (res.ok) loadUsers();
 }
 
+async function checkUpdate() {
+  const res = await fetch('/api/update/check', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  const data = await res.json();
+  const info = document.getElementById('update-info');
+  info.innerHTML = `
+    <div style="padding:1rem; background:rgba(255,255,255,0.05); border-radius:8px; margin-bottom:1rem;">
+      <p>Latest Version: ${data.version}</p>
+      <p>Message: ${data.message}</p>
+      <p>Type: ${data.type}</p>
+    </div>
+  `;
+}
+
 async function updateServer() {
   const res = await fetch('/api/update/server', {
     method: 'POST',
