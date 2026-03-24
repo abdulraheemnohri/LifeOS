@@ -61,16 +61,26 @@ GitHub (version.json updates)
 
 ### 2. Server Setup
 ```bash
+# From the project root:
 cd server
 npm install
+cp .env.example .env
 ```
 
 ### 3. Running the Server
 ```bash
 # From the server directory:
 node app.js
+# Or using npm start (if configured):
+npm start
 ```
 The server will start on `http://localhost:3000`.
+
+### 4. Running Backend Tests
+```bash
+# From the server directory:
+./node_modules/.bin/jest
+```
 
 ### 4. Client Setup & Running
 The client is a static application. You can serve it using any static file server or simply open `client/index.html` in your browser.
