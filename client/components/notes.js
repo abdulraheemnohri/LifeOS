@@ -4,7 +4,7 @@ const NotesComponent = {
         return `
             <div class="glass-card">
                 <div class="section-header">
-                    <h1>📝 Notes</h1>
+                    <h1><svg style="width:24px; vertical-align:middle;" viewBox="0 0 24 24"><path fill="currentColor" d="M3 18h12v-2H3v2zM3 6v2h18V6H3zm0 7h18v-2H3v2z"/></svg> Notes</h1>
                     <button onclick="NotesComponent.add()" style="width: auto;">+ New Note</button>
                 </div>
                 <div id="note-form" class="card" style="display:none; margin-bottom: 2rem;">
