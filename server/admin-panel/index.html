@@ -21,6 +21,7 @@
             <div class="tabs">
                 <button onclick="showTab('users-tab')">User Management</button>
                 <button onclick="showTab('update-tab')">System Update</button>
+                <button onclick="showTab('settings-tab')">System Settings</button>
                 <button onclick="logout()">Logout</button>
             </div>
 
@@ -46,6 +47,20 @@
                 <h3>Trigger Server Update</h3>
                 <button onclick="updateServer()">Update Server (git pull + npm install)</button>
                 <pre id="update-log"></pre>
+            </div>
+
+            <div id="settings-tab" class="tab-content" style="display:none;">
+                <h3>Global System Settings</h3>
+                <div class="card">
+                    <label>System Name</label>
+                    <input type="text" id="sys-name" value="LifeOS Sync Enterprise">
+                    <label>Maintenance Mode</label>
+                    <select id="sys-maint">
+                        <option value="false">Off</option>
+                        <option value="true">On</option>
+                    </select>
+                    <button onclick="saveSysSettings()">Save Settings</button>
+                </div>
             </div>
         </div>
     </div>

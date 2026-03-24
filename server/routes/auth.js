@@ -28,7 +28,52 @@ router.post('/login', (req, res) => {
 
       res.json({
         token,
-        user: { id: user.id, username: user.username, role: user.role }
+        user: {
+          id: user.id,
+          username: user.username,
+          role: user.role,
+          full_name: user.full_name,
+          email: user.email,
+          bio: user.bio
+        }
+      });
+    });
+  });
+});
+
+const auth = require('../middleware/auth');
+
+// PUT /api/auth/profile
+router.put('/profile', auth, (req, res) => {
+  const { full_name, email, bio } = req.body;
+  const userId = req.user.id;
+
+  db.run(
+    'UPDATE users SET full_name = ?, email = ?, bio = ? WHERE id = ?',
+    [full_name, email, bio, userId],
+    function(err) {
+      if (err) return res.status(500).json({ message: 'Server error' });
+      res.json({ success: true, message: 'Profile updated' });
+    }
+  );
+});
+
+// PUT /api/auth/change-password
+router.put('/change-password', auth, (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.user.id;
+
+  db.get('SELECT password FROM users WHERE id = ?', [userId], (err, user) => {
+    if (err) return res.status(500).json({ message: 'Server error' });
+
+    bcrypt.compare(currentPassword, user.password, (err, isMatch) => {
+      if (!isMatch) return res.status(400).json({ message: 'Current password incorrect' });
+
+      bcrypt.hash(newPassword, 10, (err, hash) => {
+        db.run('UPDATE users SET password = ? WHERE id = ?', [hash, userId], (err) => {
+          if (err) return res.status(500).json({ message: 'Server error' });
+          res.json({ success: true, message: 'Password updated' });
+        });
       });
     });
   });
