@@ -37,7 +37,12 @@ db.serialize(() => {
       columns += `, title TEXT, description TEXT, date TEXT`;
     }
 
-    db.run(`CREATE TABLE IF NOT EXISTS ${table} (${columns})`);
+    db.run(`CREATE TABLE IF NOT EXISTS ${table} (${columns})`, (err) => {
+      if (!err) {
+        db.run(`CREATE INDEX IF NOT EXISTS idx_${table}_user_id ON ${table} (user_id)`);
+        db.run(`CREATE INDEX IF NOT EXISTS idx_${table}_updated_at ON ${table} (updated_at)`);
+      }
+    });
   });
 });
 
