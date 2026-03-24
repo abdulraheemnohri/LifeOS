@@ -22,7 +22,7 @@ const LoansComponent = {
                     ${data.map(item => `
                         <div class="card">
                             <h3 style="color: ${item.type === 'Given' ? 'var(--primary)' : 'var(--danger)'}">${item.person}</h3>
-                            <p style="font-size: 1.5rem;">$${parseFloat(item.amount).toFixed(2)}</p>
+                            <p style="font-size: 1.5rem;">${formatCurrency(item.amount)}</p>
                             <p>${item.type}</p>
                             <p>${item.date}</p>
                             <p>Status: ${item.status}</p>

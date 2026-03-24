@@ -35,6 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check for updates every hour
     setInterval(checkUpdate, 3600000);
     // checkUpdate(); // Disable auto-check on load for verification ease
+
+    // DEBUG: Ensure login persists for testing
+    if (localStorage.getItem('lifeos_token')) {
+        showMainApp();
+    }
 });
 
 function showLoading(show) {
@@ -186,6 +191,23 @@ function showSection(section) {
     if (activeBtn) activeBtn.classList.add('active');
 
     renderCurrentSection();
+}
+
+function formatCurrency(amount) {
+    const currency = localStorage.getItem('lifeos_currency') || 'USD';
+    const symbolMap = {
+        'USD': '$',
+        'PKR': 'Rs.',
+        'EUR': '€',
+        'GBP': '£'
+    };
+    const symbol = symbolMap[currency] || '$';
+    return `${symbol}${parseFloat(amount).toFixed(2)}`;
+}
+
+function toggleMoreMenu() {
+    const menu = document.getElementById('more-menu');
+    menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
 }
 
 function renderCurrentSection() {

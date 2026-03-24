@@ -16,6 +16,16 @@ db.serialize(() => {
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   )`);
 
+    db.run(`CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    )`, (err) => {
+      if (!err) {
+        db.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('system_name', 'LifeOS Sync Enterprise')`);
+        db.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('maintenance_mode', 'false')`);
+      }
+    });
+
   // Common tables with data structure:
   // id TEXT PRIMARY KEY, user_id INTEGER, created_at TEXT, updated_at TEXT, synced INTEGER
   const tables = ['income', 'bills', 'loans', 'notes', 'experience'];

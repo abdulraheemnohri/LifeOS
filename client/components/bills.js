@@ -19,7 +19,7 @@ const BillsComponent = {
                     ${data.map(item => `
                         <div class="card">
                             <h3>${item.name}</h3>
-                            <p style="font-size: 1.5rem; color: var(--danger)">$${parseFloat(item.amount).toFixed(2)}</p>
+                            <p style="font-size: 1.5rem; color: var(--danger)">${formatCurrency(item.amount)}</p>
                             <p>${item.date}</p>
                             <p>${item.note || ''}</p>
                             <button onclick="BillsComponent.delete('${item.id}')" class="delete-btn" style="width:auto; margin-top:1rem;">Delete</button>

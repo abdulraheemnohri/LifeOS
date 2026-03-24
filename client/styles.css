@@ -4,6 +4,7 @@
     --card: rgba(30, 41, 59, 0.7);
     --accent: #38bdf8;
     --danger: #ef4444;
+    --glass: rgba(255, 255, 255, 0.1);
 }
 
 body {
@@ -24,11 +25,11 @@ body {
 
 .glass-card {
     background: var(--card);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
     padding: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .desktop-nav {
@@ -60,11 +61,35 @@ body {
     left: 0;
     right: 0;
     background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     justify-content: space-around;
     padding: 0.5rem 0;
+    padding-bottom: env(safe-area-inset-bottom);
     z-index: 1000;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+}
+
+.more-menu-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    display: flex;
+    align-items: flex-end;
+}
+
+.more-menu-content {
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    padding: 2rem;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
 }
 
 .mobile-bottom-nav button {
@@ -105,9 +130,10 @@ input, button {
 button {
     background-color: var(--primary);
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
     border: none;
-    transition: 0.3s;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
 }
 
 button:hover {
@@ -196,8 +222,8 @@ button:hover {
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
+/* Tablet & Mobile Responsive */
+@media (max-width: 1024px) {
     .desktop-nav {
         display: none;
     }
@@ -205,10 +231,30 @@ button:hover {
         display: flex;
     }
     #app-container {
-        padding-bottom: 5rem;
+        padding: 0.5rem;
+        padding-bottom: 7rem;
     }
     .grid {
         grid-template-columns: 1fr;
+    }
+    .glass-card {
+        padding: 1.2rem;
+        border-radius: 15px;
+    }
+    h1 { font-size: 1.8rem; }
+}
+
+/* Responsive Fixes for Content */
+@media (max-width: 480px) {
+    .grid {
+        gap: 0.5rem;
+    }
+    .card {
+        padding: 1rem;
+    }
+    .quick-action-btn {
+        padding: 0.8rem;
+        font-size: 0.8rem;
     }
 }
 
@@ -227,10 +273,37 @@ button:hover {
 }
 
 .card {
-    background: var(--card);
+    background: rgba(255, 255, 255, 0.03);
     padding: 1.5rem;
-    border-radius: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(5px);
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.quick-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px);
+    border-color: var(--accent);
+}
+
+.quick-action-btn svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 0.5rem;
+    fill: var(--primary);
 }
 
 .timeline {
