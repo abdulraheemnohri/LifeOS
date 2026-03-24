@@ -54,14 +54,22 @@ const API = {
     }),
 
     checkUpdate: async () => {
-        // In real app, this would be a version.json on GitHub
-        // For simulation, we'll return a mock version if not matched
         const CURRENT_VERSION = '1.0.0';
+        // Configurable GitHub RAW URL for version.json
+        const GITHUB_VERSION_URL = 'https://raw.githubusercontent.com/abdulraheemnohri/LifeOS/main/version.json';
+
         try {
-            // Simulated version fetch
-            const res = { version: '1.0.1', message: 'New features added', type: 'optional' };
-            if (res.version !== CURRENT_VERSION) return res;
+            const response = await fetch(GITHUB_VERSION_URL, { cache: 'no-store' });
+            if (!response.ok) return null;
+            const res = await response.json();
+
+            if (res.version !== CURRENT_VERSION) {
+                return res;
+            }
             return null;
-        } catch (e) { return null; }
+        } catch (e) {
+            console.warn('Update check failed:', e);
+            return null;
+        }
     }
 };
