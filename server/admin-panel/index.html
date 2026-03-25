@@ -22,6 +22,7 @@
                 <button onclick="showTab('users-tab')">User Management</button>
                 <button onclick="showTab('update-tab')">System Update</button>
                 <button onclick="showTab('settings-tab')">System Settings</button>
+                <button onclick="showTab('logs-tab')">System Logs</button>
                 <button onclick="logout()">Logout</button>
             </div>
 
@@ -68,6 +69,21 @@
                     </select>
                     <button onclick="saveSysSettings()">Save Settings</button>
                 </div>
+
+                <h3>Database Backup</h3>
+                <div class="card">
+                    <p>Download the current SQLite database file.</p>
+                    <button onclick="downloadDB()">Download database.sqlite</button>
+                </div>
+            </div>
+
+            <div id="logs-tab" class="tab-content" style="display:none;">
+                <h3>System Logs</h3>
+                <div id="logs-container" style="background:#000; color:#0f0; padding:1rem; height:300px; overflow-y:auto; font-family:monospace; font-size:0.8rem;">
+                    [INFO] System initialized...
+                    [INFO] Sync service ready...
+                </div>
+                <button onclick="refreshLogs()">Refresh Logs</button>
             </div>
         </div>
     </div>

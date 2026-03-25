@@ -5,7 +5,7 @@ const syncService = require('../services/syncService');
 
 router.use(auth);
 
-const TABLES = ['income', 'bills', 'loans', 'notes', 'experience', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields'];
+const TABLES = ['income', 'bills', 'loans', 'notes', 'experience', 'tasks', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields', 'budgets'];
 
 // POST /api/sync/push
 router.post('/push', async (req, res) => {

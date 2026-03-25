@@ -50,6 +50,25 @@ const SettingsComponent = {
                 </div>
 
                 <div class="card" style="margin-top: 2rem;">
+                    <h3>Budget Management</h3>
+                    <p>Set monthly spending limits for each category.</p>
+                    <div id="budget-list">
+                        ${Storage.getData('categories').filter(c => c.type === 'expense').map(cat => {
+                            const budget = Storage.getData('budgets').find(b => b.category === cat.name);
+                            return `
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; background:rgba(255,255,255,0.05); padding:0.8rem; border-radius:12px;">
+                                    <span>${cat.name}</span>
+                                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                                        <input type="number" id="budget-val-${cat.id}" value="${budget ? budget.amount : ''}" placeholder="0" style="width:80px; margin:0; padding:4px;">
+                                        <button onclick="SettingsComponent.saveBudget('${cat.id}', '${cat.name}')" style="width:auto; padding:4px 8px; font-size:0.7rem;">Set</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
                     <h3>Category Management</h3>
                     <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div>
@@ -138,9 +157,13 @@ const SettingsComponent = {
                 </div>
 
                 <div class="card" style="margin-top: 2rem;">
-                    <h3>Storage Management</h3>
+                    <h3>Data Management</h3>
                     <p>Local Cache Usage: ~${(JSON.stringify(localStorage).length / 1024).toFixed(2)} KB</p>
-                    <button onclick="SettingsComponent.clearLocalCache()" style="background:var(--danger)">Clear Local Cache (Except Auth)</button>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+                        <button onclick="SettingsComponent.exportCSV('income')" style="background:var(--primary)">Export Income CSV</button>
+                        <button onclick="SettingsComponent.exportCSV('bills')" style="background:var(--danger)">Export Expense CSV</button>
+                    </div>
+                    <button onclick="SettingsComponent.clearLocalCache()" style="background:var(--danger); margin-top:1rem;">Clear Local Cache (Except Auth)</button>
                     <p style="color:var(--danger); font-size: 0.8rem;">* This will not delete data from the server.</p>
                 </div>
 
@@ -202,11 +225,41 @@ const SettingsComponent = {
     },
     clearLocalCache: () => {
         if (!confirm('Clear all local data? This will re-pull everything from the server.')) return;
-        const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields'];
+        const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'tasks', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields'];
         tables.forEach(t => localStorage.removeItem(`lifeos_${t}`));
         localStorage.removeItem('lifeos_last_sync_time');
         alert('Cache cleared.');
         location.reload();
+    },
+    exportCSV: (table) => {
+        const data = Storage.getData(table);
+        if (data.length === 0) return alert('No data to export');
+
+        const headers = Object.keys(data[0]).join(',');
+        const rows = data.map(item => Object.values(item).map(val => `"${val}"`).join(','));
+        const csvContent = "data:text/csv;charset=utf-8," + headers + "\n" + rows.join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `lifeos_${table}_export.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    },
+    saveBudget: (catId, catName) => {
+        const amount = document.getElementById(`budget-val-${catId}`).value;
+        const budgets = Storage.getData('budgets', true);
+        let budget = budgets.find(b => b.category === catName);
+
+        if (budget) {
+            budget.amount = parseFloat(amount);
+            Storage.saveData('budgets', budget);
+        } else {
+            Storage.saveData('budgets', { id: 'bud-' + Date.now(), category: catName, amount: parseFloat(amount) });
+        }
+        alert('Budget updated');
+        Sync.performSync();
     },
     addBillCat: () => {
         const name = document.getElementById('new-bill-cat-name').value;

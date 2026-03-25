@@ -60,6 +60,16 @@
 
         <!-- Dashboard View (Initially Hidden) -->
         <div id="main-view" style="display:none;">
+            <div id="fab-container">
+                <button id="fab-main" onclick="toggleFab()">+</button>
+                <div id="fab-menu" style="display:none;">
+                    <button onclick="showSection('income'); setTimeout(()=>IncomeComponent.add(),100); toggleFab()">💰 Income</button>
+                    <button onclick="showSection('bills'); setTimeout(()=>BillsComponent.add(),100); toggleFab()">🧾 Bill</button>
+                    <button onclick="showSection('notes'); setTimeout(()=>NotesComponent.add(),100); toggleFab()">📝 Note</button>
+                    <button onclick="showSection('tasks'); setTimeout(()=>TasksComponent.add(),100); toggleFab()">✅ Task</button>
+                </div>
+            </div>
+
             <nav class="glass-nav desktop-nav">
                 <div class="logo-small">🚀 LifeOS</div>
                 <button onclick="showSection('dashboard')">📊 Dashboard</button>
@@ -67,6 +77,7 @@
                 <button onclick="showSection('bills')">🧾 Bills</button>
                 <button onclick="showSection('loans')">🤝 Loans</button>
                 <button onclick="showSection('notes')">📝 Notes</button>
+                <button onclick="showSection('tasks')">✅ Tasks</button>
                 <button onclick="showSection('experience')">📘 Experience</button>
                 <div class="nav-spacer"></div>
                 <button onclick="showSection('profile')">👤 Profile</button>
@@ -140,6 +151,7 @@
     <script src="components/loans.js"></script>
     <script src="components/notes.js"></script>
     <script src="components/experience.js"></script>
+    <script src="components/tasks.js"></script>
     <script src="components/profile.js"></script>
     <script src="components/settings.js"></script>
     <script src="components/wifi.js"></script>

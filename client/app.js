@@ -2,7 +2,27 @@ let currentSection = 'dashboard';
 
 let appMode = localStorage.getItem('lifeos_mode') || 'cloud'; // 'cloud' or 'local'
 
+const Notifications = {
+    show: (message, type = 'success') => {
+        const container = document.getElementById('notification-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<span>${message}</span>`;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('removing');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Add notification container
+    const notifyDiv = document.createElement('div');
+    notifyDiv.id = 'notification-container';
+    document.body.appendChild(notifyDiv);
+
     // Register Service Worker for automatic updates
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').then(reg => {
@@ -221,8 +241,22 @@ function toggleMoreMenu() {
     menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
 }
 
+function toggleFab() {
+    const menu = document.getElementById('fab-menu');
+    const fab = document.getElementById('fab-main');
+    const isOpen = menu.style.display === 'flex';
+
+    menu.style.display = isOpen ? 'none' : 'flex';
+    fab.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(45deg)';
+    fab.style.background = isOpen ? 'var(--primary)' : 'var(--danger)';
+}
+
 function renderCurrentSection() {
     const area = document.getElementById('content-area');
+    area.classList.remove('fade-in');
+    void area.offsetWidth; // Force reflow
+    area.classList.add('fade-in');
+
     switch (currentSection) {
         case 'dashboard': area.innerHTML = DashboardComponent.render(); break;
         case 'income': area.innerHTML = IncomeComponent.render(); break;
@@ -230,6 +264,7 @@ function renderCurrentSection() {
         case 'loans': area.innerHTML = LoansComponent.render(); break;
         case 'notes': area.innerHTML = NotesComponent.render(); break;
         case 'experience': area.innerHTML = ExperienceComponent.render(); break;
+        case 'tasks': area.innerHTML = TasksComponent.render(); break;
         case 'wifi': area.innerHTML = WiFiComponent.render(); break;
         case 'profile': area.innerHTML = ProfileComponent.render(); break;
         case 'settings': area.innerHTML = SettingsComponent.render(); break;

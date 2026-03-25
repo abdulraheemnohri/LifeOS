@@ -15,6 +15,7 @@ const DashboardComponent = {
         const netWorth = balance + loansGiven - loansTaken;
 
         setTimeout(() => {
+            // Main Overview Chart
             const ctx = document.getElementById('dashboardChart').getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
@@ -22,16 +23,42 @@ const DashboardComponent = {
                     labels: ['Income', 'Expense', 'Loans Taken'],
                     datasets: [{
                         data: [income, expense, loansTaken],
-                        backgroundColor: ['#22c55e', '#ef4444', '#38bdf8'],
+                        backgroundColor: ['#22c55e', '#f43f5e', '#38bdf8'],
                         borderWidth: 0
                     }]
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { labels: { color: 'white' } } }
+                    plugins: { legend: { position: 'bottom', labels: { color: 'white', padding: 20 } } }
+                }
+            });
+
+            // Category Distribution Chart
+            const catCtx = document.getElementById('categoryChart').getContext('2d');
+            const catData = {};
+            expenseItems.forEach(item => {
+                const cat = item.category || 'General';
+                catData[cat] = (catData[cat] || 0) + (parseFloat(item.amount) || 0);
+            });
+
+            new Chart(catCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(catData),
+                    datasets: [{
+                        data: Object.values(catData),
+                        backgroundColor: ['#38bdf8', '#a855f7', '#fbbf24', '#f43f5e', '#22c55e'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }
                 }
             });
         }, 100);
+
+        const budgets = Storage.getData('budgets');
 
         const user = JSON.parse(localStorage.getItem('lifeos_user')) || {};
         const recentNotes = Storage.getData('notes').slice(-3).reverse();
@@ -141,8 +168,43 @@ const DashboardComponent = {
                         <p style="font-size: 2rem;">${formatCurrency(balance)}</p>
                     </div>
                 </div>
-                <div style="max-width: 300px; margin: 2rem auto;">
-                    <canvas id="dashboardChart"></canvas>
+                <div class="grid" style="margin-top: 3rem;">
+                    <div class="card">
+                        <h3 style="text-align:center; margin-bottom:1rem;">Overview</h3>
+                        <canvas id="dashboardChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3 style="text-align:center; margin-bottom:1rem;">Expense by Category</h3>
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 3rem;">
+                    <h3>Monthly Budget vs Actual</h3>
+                    ${budgets.length ? budgets.map(b => {
+                        const actual = expenseItems.filter(e => e.category === b.category).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+                        const percent = Math.min((actual / (b.amount || 1)) * 100, 100);
+                        return `
+                            <div style="margin-bottom:1.5rem;">
+                                <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:0.4rem;">
+                                    <span>${b.category}</span>
+                                    <span>${formatCurrency(actual)} / ${formatCurrency(b.amount)}</span>
+                                </div>
+                                <div style="width:100%; height:10px; background:rgba(255,255,255,0.05); border-radius:5px; overflow:hidden;">
+                                    <div style="width:${percent}%; height:100%; background:${percent > 90 ? 'var(--danger)' : (percent > 70 ? '#fbbf24' : 'var(--primary)')}; border-radius:5px; transition:width 1s ease-out;"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('') : '<p style="opacity:0.5;">No budgets set. Go to Settings to define them.</p>'}
+                </div>
+
+                <div class="card" style="margin-top: 2rem; background: linear-gradient(135deg, #fbbf2422, transparent); border-left: 5px solid #fbbf24;">
+                    <h3>Savings Goal</h3>
+                    <p>Target: ${formatCurrency(100000)}</p>
+                    <div style="width:100%; height:12px; background:rgba(255,255,255,0.1); border-radius:6px; margin-top:0.8rem;">
+                        <div style="width:${Math.min((netWorth / 100000) * 100, 100)}%; height:100%; background:#fbbf24; border-radius:6px; box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);"></div>
+                    </div>
+                    <p style="text-align:right; font-size:0.8rem; margin-top:0.5rem;">${((netWorth / 100000) * 100).toFixed(1)}% Achieved</p>
                 </div>
 
                 <div class="grid" style="margin-top: 3rem;">

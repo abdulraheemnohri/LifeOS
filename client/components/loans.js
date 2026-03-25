@@ -1,11 +1,16 @@
 const LoansComponent = {
     render: () => {
-        const data = Storage.getData('loans');
+        const searchQuery = localStorage.getItem('loans_search') || '';
+        const data = Storage.getData('loans')
+            .filter(l => l.person.toLowerCase().includes(searchQuery.toLowerCase()));
         return `
             <div class="glass-card">
                 <div class="section-header">
                     <h1>🤝 Loans</h1>
                     <button onclick="LoansComponent.add()" style="width: auto;">+ Add Loan</button>
+                </div>
+                <div class="card" style="margin-bottom: 2rem;">
+                    <input type="text" placeholder="Search by person..." value="${searchQuery}" oninput="LoansComponent.search(this.value)" style="margin-bottom:0;">
                 </div>
                 <div id="loan-form" class="card" style="display:none; margin-bottom: 2rem;">
                     <input type="text" id="loan-person" placeholder="Person">
@@ -53,5 +58,9 @@ const LoansComponent = {
             renderCurrentSection();
             Sync.performSync();
         }
+    },
+    search: (val) => {
+        localStorage.setItem('loans_search', val);
+        renderCurrentSection();
     }
 };

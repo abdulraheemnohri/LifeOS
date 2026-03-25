@@ -25,6 +25,7 @@ const Storage = {
         }
 
         localStorage.setItem(`lifeos_${table}`, JSON.stringify(existing));
+        if (typeof Notifications !== 'undefined') Notifications.show(`Saved to ${table}`);
     },
 
     getData: (table, includeDeleted = false) => {
@@ -41,11 +42,12 @@ const Storage = {
             existing[index].updated_at = new Date().toISOString();
             existing[index].synced = 0;
             localStorage.setItem(`lifeos_${table}`, JSON.stringify(existing));
+            if (typeof Notifications !== 'undefined') Notifications.show(`Deleted from ${table}`, 'error');
         }
     },
 
     getAllForSync: () => {
-        const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields'];
+        const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'tasks', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields', 'budgets'];
         const allData = {};
         tables.forEach(t => {
             const unsynced = Storage.getData(t, true).filter(item => item.synced === 0);

@@ -1,6 +1,8 @@
 const BillsComponent = {
     render: () => {
-        const data = Storage.getData('bills');
+        const searchQuery = localStorage.getItem('bills_search') || '';
+        const data = Storage.getData('bills')
+            .filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()) || (b.category || '').toLowerCase().includes(searchQuery.toLowerCase()));
         const categories = Storage.getData('categories').filter(c => c.type === 'expense');
         const billCategories = Storage.getData('bill_categories');
 
@@ -9,6 +11,9 @@ const BillsComponent = {
                 <div class="section-header">
                     <h1>🧾 Bills & Expenses</h1>
                     <button onclick="BillsComponent.add()" style="width: auto;">+ Add Expense</button>
+                </div>
+                <div class="card" style="margin-bottom: 2rem;">
+                    <input type="text" placeholder="Search expenses or categories..." value="${searchQuery}" oninput="BillsComponent.search(this.value)" style="margin-bottom:0;">
                 </div>
                 <div id="bill-form" class="card" style="display:none; margin-bottom: 2rem;">
                     <input type="text" id="bill-name" placeholder="Expense Name (e.g. Rent)">
@@ -28,6 +33,9 @@ const BillsComponent = {
 
                     <input type="date" id="bill-date" value="${new Date().toISOString().split('T')[0]}">
                     <input type="text" id="bill-note" placeholder="Note (optional)">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="bill-recurring"> Recurring Monthly
+                    </label>
                     <button onclick="BillsComponent.save()">Save Expense</button>
                     <button onclick="document.getElementById('bill-form').style.display='none'" style="background:var(--danger)">Cancel</button>
                 </div>
@@ -47,7 +55,7 @@ const BillsComponent = {
                                     <span class="badge bg-danger">${item.category || 'General'}</span>
                                 </div>
                                 <p style="font-size: 1.5rem; color: var(--danger)">${formatCurrency(item.amount)}</p>
-                                <p>${item.date}</p>
+                                <p>${item.date} ${item.is_recurring ? '🔄' : ''}</p>
                                 <div style="font-size: 0.85rem; margin-top: 0.5rem; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px;">
                                     ${dynamicInfo || '<em style="opacity:0.5">No dynamic data</em>'}
                                 </div>
@@ -70,6 +78,7 @@ const BillsComponent = {
         const category_id = document.getElementById('bill-dynamic-category').value;
         const date = document.getElementById('bill-date').value;
         const note = document.getElementById('bill-note').value;
+        const is_recurring = document.getElementById('bill-recurring').checked ? 1 : 0;
 
         const dynamicData = {};
         if (category_id) {
@@ -89,7 +98,8 @@ const BillsComponent = {
                 category_id,
                 dynamic_data: JSON.stringify(dynamicData),
                 date,
-                note
+                note,
+                is_recurring
             });
             renderCurrentSection();
             Sync.performSync();
@@ -119,5 +129,9 @@ const BillsComponent = {
             renderCurrentSection();
             Sync.performSync();
         }
+    },
+    search: (val) => {
+        localStorage.setItem('bills_search', val);
+        renderCurrentSection();
     }
 };
