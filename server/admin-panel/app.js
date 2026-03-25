@@ -136,3 +136,22 @@ function saveSysSettings() {
   alert(`Settings Saved!\nName: ${name}\nMaintenance: ${maint}`);
   // In a real app, this would be a PUT /api/admin/settings
 }
+
+function downloadDB() {
+  const link = document.createElement("a");
+  link.href = "/api/admin/backup";
+  link.setAttribute("download", "database.sqlite");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+async function refreshLogs() {
+  const res = await fetch('/api/admin/logs', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  const logs = await res.json();
+  const container = document.getElementById('logs-container');
+  container.innerHTML = logs.map(l => `<div>[${l.timestamp}] ${l.message}</div>`).join('');
+  container.scrollTop = container.scrollHeight;
+}

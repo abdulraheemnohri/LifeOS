@@ -3,12 +3,32 @@ const Sync = {
     lastSyncTime: localStorage.getItem('lifeos_last_sync_time'),
 
     generateMonthlyBills: () => {
+        const currentMonth = new Date().toISOString().substring(0, 7);
+        const lastGenerated = localStorage.getItem('lifeos_recurring_last_gen');
+
+        if (lastGenerated !== currentMonth) {
+            // Clone recurring income
+            const incomes = Storage.getData('income');
+            incomes.filter(i => i.is_recurring && i.date.substring(0, 7) < currentMonth).forEach(i => {
+                const newId = 'inc-' + Date.now() + Math.random();
+                Storage.saveData('income', { ...i, id: newId, date: currentMonth + i.date.substring(7) });
+            });
+
+            // Clone recurring bills
+            const bills = Storage.getData('bills');
+            bills.filter(b => b.is_recurring && b.date.substring(0, 7) < currentMonth).forEach(b => {
+                const newId = 'bill-' + Date.now() + Math.random();
+                Storage.saveData('bills', { ...b, id: newId, date: currentMonth + b.date.substring(7) });
+            });
+
+            localStorage.setItem('lifeos_recurring_last_gen', currentMonth);
+        }
+
         const billingTypes = Storage.getData('billing_types');
         const clients = Storage.getData('wifi_clients');
-        const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
-        const lastGenerated = localStorage.getItem('lifeos_wifi_last_gen');
+        const wifiLastGenerated = localStorage.getItem('lifeos_wifi_last_gen');
 
-        if (lastGenerated === currentMonth) return;
+        if (wifiLastGenerated === currentMonth) return;
 
         clients.forEach(client => {
             const type = billingTypes.find(t => t.id === client.type_id);
@@ -62,6 +82,7 @@ const Sync = {
             }
 
             console.log('Sync completed successfully.');
+            if (typeof Notifications !== 'undefined') Notifications.show('Data Synced', 'info');
             // Refresh current UI view if needed
             if (typeof renderCurrentSection === 'function') renderCurrentSection();
         } catch (error) {

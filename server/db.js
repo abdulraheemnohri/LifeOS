@@ -28,7 +28,7 @@ db.serialize(() => {
 
   // Common tables with data structure:
   // id TEXT PRIMARY KEY, user_id INTEGER, created_at TEXT, updated_at TEXT, synced INTEGER
-  const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields'];
+  const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'tasks', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields', 'budgets'];
 
   tables.forEach(table => {
     let columns = `
@@ -41,13 +41,15 @@ db.serialize(() => {
     `;
 
     if (table === 'income' || table === 'bills') {
-      columns += `, name TEXT, amount REAL, date TEXT, category TEXT, category_id TEXT, dynamic_data TEXT, note TEXT`;
+      columns += `, name TEXT, amount REAL, date TEXT, category TEXT, category_id TEXT, dynamic_data TEXT, note TEXT, is_recurring INTEGER DEFAULT 0`;
     } else if (table === 'loans') {
       columns += `, person TEXT, amount REAL, type TEXT, date TEXT, status TEXT, note TEXT`;
     } else if (table === 'notes') {
       columns += `, title TEXT, content TEXT, color TEXT, pinned INTEGER DEFAULT 0, archived INTEGER DEFAULT 0`;
     } else if (table === 'experience') {
       columns += `, title TEXT, description TEXT, date TEXT, rating INTEGER, location TEXT, media_url TEXT, tags TEXT`;
+    } else if (table === 'tasks') {
+      columns += `, title TEXT, priority TEXT, due_date TEXT, completed INTEGER DEFAULT 0`;
     } else if (table === 'wifi_clients') {
       columns += `, type_id TEXT, name TEXT, mobile TEXT, imei TEXT, monthly_rate REAL, note TEXT`;
     } else if (table === 'wifi_payments') {
@@ -60,6 +62,8 @@ db.serialize(() => {
       columns += `, name TEXT`;
     } else if (table === 'bill_category_fields') {
       columns += `, category_id TEXT, field_name TEXT, field_type TEXT, field_order INTEGER`;
+    } else if (table === 'budgets') {
+      columns += `, category TEXT, amount REAL`;
     }
 
     db.run(`CREATE TABLE IF NOT EXISTS ${table} (${columns})`, (err) => {

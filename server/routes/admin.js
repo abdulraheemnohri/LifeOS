@@ -71,4 +71,21 @@ router.post('/reset-password', (req, res) => {
   });
 });
 
+// GET /api/admin/backup
+router.get('/backup', (req, res) => {
+  const dbFile = require('../config/config').DB_PATH;
+  res.download(dbFile);
+});
+
+// GET /api/admin/logs
+router.get('/logs', (req, res) => {
+  // Simple mock logs
+  const logs = [
+    { timestamp: new Date().toISOString(), message: 'User admin logged in' },
+    { timestamp: new Date().toISOString(), message: 'Sync push from user 1: 5 items' },
+    { timestamp: new Date().toISOString(), message: 'New user created: test_user' }
+  ];
+  res.json(logs);
+});
+
 module.exports = router;
