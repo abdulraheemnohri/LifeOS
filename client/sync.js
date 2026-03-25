@@ -2,6 +2,36 @@ const Sync = {
     isSyncing: false,
     lastSyncTime: localStorage.getItem('lifeos_last_sync_time'),
 
+    generateMonthlyBills: () => {
+        const billingTypes = Storage.getData('billing_types');
+        const clients = Storage.getData('wifi_clients');
+        const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+        const lastGenerated = localStorage.getItem('lifeos_wifi_last_gen');
+
+        if (lastGenerated === currentMonth) return;
+
+        clients.forEach(client => {
+            const type = billingTypes.find(t => t.id === client.type_id);
+            if (type && type.type === 'Variable') return; // Don't auto-gen variable bills
+
+            const payments = Storage.getData('wifi_payments');
+            const exists = payments.find(p => p.client_id === client.id && p.month === currentMonth);
+
+            if (!exists) {
+                Storage.saveData('wifi_payments', {
+                    id: `pay-${client.id}-${currentMonth}`,
+                    client_id: client.id,
+                    month: currentMonth,
+                    amount: client.monthly_rate,
+                    status: 'Pending',
+                    date_paid: ''
+                });
+            }
+        });
+
+        localStorage.setItem('lifeos_wifi_last_gen', currentMonth);
+    },
+
     performSync: async () => {
         const isLocal = localStorage.getItem('lifeos_mode') === 'local';
         const serverUrl = localStorage.getItem('lifeos_server_url');
@@ -42,6 +72,8 @@ const Sync = {
     },
 
     initAutoSync: () => {
+        Sync.generateMonthlyBills();
+
         // Clear any existing sync interval
         if (Sync.syncInterval) clearInterval(Sync.syncInterval);
 

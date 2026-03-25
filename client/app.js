@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // DEBUG: Ensure login persists for testing
     if (localStorage.getItem('lifeos_token')) {
         showMainApp();
+    } else {
+        showModeView();
     }
 });
 
@@ -166,6 +168,15 @@ function loginLocally() {
 function showMainApp() {
     document.getElementById('login-view').style.display = 'none';
     document.getElementById('main-view').style.display = 'block';
+
+    // Toggle Billing nav based on settings
+    const billingEnabled = localStorage.getItem('lifeos_billing_enabled') === 'true';
+    const wifiNav = document.getElementById('nav-wifi');
+    if (wifiNav) wifiNav.style.display = billingEnabled ? 'flex' : 'none';
+
+    const moreWifi = document.querySelector("#more-menu button[onclick*='showSection(\\'wifi\\')']");
+    if (moreWifi) moreWifi.style.display = billingEnabled ? 'block' : 'none';
+
     Sync.initAutoSync();
     showSection('dashboard');
 }
@@ -219,6 +230,7 @@ function renderCurrentSection() {
         case 'loans': area.innerHTML = LoansComponent.render(); break;
         case 'notes': area.innerHTML = NotesComponent.render(); break;
         case 'experience': area.innerHTML = ExperienceComponent.render(); break;
+        case 'wifi': area.innerHTML = WiFiComponent.render(); break;
         case 'profile': area.innerHTML = ProfileComponent.render(); break;
         case 'settings': area.innerHTML = SettingsComponent.render(); break;
     }

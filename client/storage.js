@@ -45,7 +45,7 @@ const Storage = {
     },
 
     getAllForSync: () => {
-        const tables = ['income', 'bills', 'loans', 'notes', 'experience'];
+        const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields'];
         const allData = {};
         tables.forEach(t => {
             const unsynced = Storage.getData(t, true).filter(item => item.synced === 0);

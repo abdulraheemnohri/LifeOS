@@ -1,6 +1,7 @@
 const IncomeComponent = {
     render: () => {
         const data = Storage.getData('income');
+        const categories = Storage.getData('categories').filter(c => c.type === 'income');
         return `
             <div class="glass-card">
                 <div class="section-header">
@@ -8,18 +9,27 @@ const IncomeComponent = {
                     <button onclick="IncomeComponent.add()" style="width: auto;">+ Add Income</button>
                 </div>
                 <div id="inc-form" class="card" style="display:none; margin-bottom: 2rem;">
-                    <input type="text" id="inc-name" placeholder="Source Name">
+                    <input type="text" id="inc-name" placeholder="Source Name (e.g. Salary)">
                     <input type="number" id="inc-amount" placeholder="Amount">
+                    <select id="inc-category">
+                        <option value="">Select Category</option>
+                        ${categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+                    </select>
                     <input type="date" id="inc-date" value="${new Date().toISOString().split('T')[0]}">
+                    <input type="text" id="inc-note" placeholder="Optional Note">
                     <button onclick="IncomeComponent.save()">Save Income</button>
                     <button onclick="document.getElementById('inc-form').style.display='none'" style="background:var(--danger)">Cancel</button>
                 </div>
                 <div class="grid">
                     ${data.map(item => `
                         <div class="card">
-                            <h3>${item.name}</h3>
+                            <div style="display:flex; justify-content:space-between;">
+                                <h3>${item.name}</h3>
+                                <span class="badge bg-success">${item.category || 'General'}</span>
+                            </div>
                             <p style="font-size: 1.5rem; color: var(--primary)">${formatCurrency(item.amount)}</p>
                             <small>${item.date}</small>
+                            ${item.note ? `<p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.7;">${item.note}</p>` : ''}
                             <button onclick="IncomeComponent.delete('${item.id}')" class="delete-btn" style="width:auto; margin-top:1rem;">Delete</button>
                         </div>
                     `).join('')}
@@ -33,9 +43,11 @@ const IncomeComponent = {
     save: () => {
         const name = document.getElementById('inc-name').value;
         const amount = document.getElementById('inc-amount').value;
+        const category = document.getElementById('inc-category').value;
         const date = document.getElementById('inc-date').value;
+        const note = document.getElementById('inc-note').value;
         if (name && amount) {
-            Storage.saveData('income', { id: 'inc-' + Date.now(), name, amount, date });
+            Storage.saveData('income', { id: 'inc-' + Date.now(), name, amount, category, date, note });
             renderCurrentSection();
             Sync.performSync();
         }

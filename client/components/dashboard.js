@@ -1,19 +1,28 @@
 const DashboardComponent = {
     render: () => {
         // Fetch values from local storage (synced)
-        const income = Storage.getData('income').reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
-        const expense = Storage.getData('bills').reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
+        const incomeItems = Storage.getData('income');
+        const expenseItems = Storage.getData('bills');
+        const loans = Storage.getData('loans');
+
+        const income = incomeItems.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
+        const expense = expenseItems.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
         const balance = income - expense;
+
+        // Net Worth: Assets (Income - Expense) + (Loans Given) - (Loans Taken)
+        const loansGiven = loans.filter(l => l.type === 'given' && l.status !== 'Returned').reduce((sum, l) => sum + (parseFloat(l.amount) || 0), 0);
+        const loansTaken = loans.filter(l => l.type === 'taken' && l.status !== 'Returned').reduce((sum, l) => sum + (parseFloat(l.amount) || 0), 0);
+        const netWorth = balance + loansGiven - loansTaken;
 
         setTimeout(() => {
             const ctx = document.getElementById('dashboardChart').getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Income', 'Expense'],
+                    labels: ['Income', 'Expense', 'Loans Taken'],
                     datasets: [{
-                        data: [income, expense],
-                        backgroundColor: ['#22c55e', '#ef4444'],
+                        data: [income, expense, loansTaken],
+                        backgroundColor: ['#22c55e', '#ef4444', '#38bdf8'],
                         borderWidth: 0
                     }]
                 },
@@ -27,12 +36,28 @@ const DashboardComponent = {
         const user = JSON.parse(localStorage.getItem('lifeos_user')) || {};
         const recentNotes = Storage.getData('notes').slice(-3).reverse();
         const recentExp = Storage.getData('experience').slice(-3).reverse();
+        const totalNotes = Storage.getData('notes').length;
+        const totalExp = Storage.getData('experience').length;
+
+        const currentMonth = new Date().toISOString().substring(0, 7);
+        const wifiPayments = Storage.getData('wifi_payments').filter(p => p.month === currentMonth);
+        const wifiCollected = wifiPayments.filter(p => p.status === 'Paid').reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+        const wifiPending = wifiPayments.filter(p => p.status === 'Pending').reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+
+        // Upcoming Bills (Unpaid bills in current month or older)
+        const unpaidBills = expenseItems.filter(b => {
+            const billMonth = (b.date || "").substring(0, 7);
+            return billMonth <= currentMonth; // Simple heuristic
+        }).slice(-3);
 
         return `
             <div class="glass-card">
                 <div class="section-header">
                     <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Dashboard</h1>
-                    <span style="opacity: 0.7">Welcome back, <strong>${user.username}</strong></span>
+                    <div style="text-align:right;">
+                        <span style="opacity: 0.7">Welcome back, <strong>${user.username}</strong></span><br>
+                        <span style="font-size:0.8rem; color:var(--accent)">Net Worth: ${formatCurrency(netWorth)}</span>
+                    </div>
                 </div>
 
                 <h3 style="margin: 2rem 0 1rem;">Quick Actions</h3>
@@ -45,9 +70,9 @@ const DashboardComponent = {
                         <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                         <span>New Note</span>
                     </div>
-                    <div class="quick-action-btn" onclick="showSection('experience'); setTimeout(() => ExperienceComponent.add(), 100)">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                        <span>Log Entry</span>
+                    <div class="quick-action-btn" onclick="showSection('wifi'); setTimeout(() => WiFiComponent.addClient(), 100)">
+                        <svg viewBox="0 0 24 24"><path d="M12.01 21.49L23.64 7c-.45-.34-4.93-4-11.64-4C5.28 3 .81 6.66.36 7l11.63 14.49.01.01.01-.01z"/></svg>
+                        <span>Add Billing</span>
                     </div>
                     <div class="quick-action-btn" onclick="Sync.performSync()">
                         <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
@@ -55,7 +80,53 @@ const DashboardComponent = {
                     </div>
                 </div>
 
-                <h3 style="margin: 3rem 0 1rem;">Financial Overview</h3>
+                <div class="grid" style="margin-top: 2rem;">
+                    <div class="card" style="background: linear-gradient(135deg, #22c55e22, transparent); border-left: 5px solid var(--primary)">
+                        <h3>Net Worth</h3>
+                        <p style="font-size: 2rem; color:var(--primary)">${formatCurrency(netWorth)}</p>
+                        <small style="opacity:0.6">Assets + Loans Given - Loans Taken</small>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #38bdf822, transparent); border-left: 5px solid var(--accent)">
+                        <h3>Monthly Progress</h3>
+                        <p style="font-size: 2rem;">${((expense / (income || 1)) * 100).toFixed(0)}%</p>
+                        <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:0.5rem;">
+                            <div style="width:${Math.min((expense / (income || 1)) * 100, 100)}%; height:100%; background:var(--danger); border-radius:4px;"></div>
+                        </div>
+                        <small style="opacity:0.6">Expense vs Total Income</small>
+                    </div>
+                </div>
+
+                <h3 style="margin: 3rem 0 1rem;">Service Billing Summary (${currentMonth})</h3>
+                <div class="grid">
+                    <div class="card" style="border-left: 5px solid var(--primary)">
+                        <h3>Collected</h3>
+                        <p style="font-size: 1.5rem;">${formatCurrency(wifiCollected)}</p>
+                    </div>
+                    <div class="card" style="border-left: 5px solid var(--danger)">
+                        <h3>Pending</h3>
+                        <p style="font-size: 1.5rem;">${formatCurrency(wifiPending)}</p>
+                    </div>
+                    <div class="card" style="border-left: 5px solid var(--accent)">
+                        <h3>System Stats</h3>
+                        <div style="display:flex; gap:1rem; margin-top:0.5rem;">
+                            <div><small>Notes:</small> <strong>${totalNotes}</strong></div>
+                            <div><small>Exp:</small> <strong>${totalExp}</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 3rem 0 1rem;">Unpaid Bills / Recent Expenses</h3>
+                <div class="card" style="padding:0; overflow:hidden;">
+                    ${unpaidBills.length ? unpaidBills.map(b => `
+                        <div style="display:flex; justify-content:space-between; padding:1rem; border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <span>${b.name}</span>
+                            <span style="color:var(--danger)">${formatCurrency(b.amount)}</span>
+                        </div>
+                    `).join('') : '<p style="padding:1rem; opacity:0.5;">No recent unpaid bills found.</p>'}
+                    <button onclick="showSection('bills')" style="width:100%; background:transparent; border-top:1px solid rgba(255,255,255,0.05); font-size:0.8rem; padding:0.5rem;">View All Bills</button>
+                </div>
+
+                <h3 style="margin: 3rem 0 1rem;">Personal Financial Overview</h3>
                 <div class="grid">
                     <div class="card" style="border-left: 5px solid var(--primary)">
                         <h3>Income</h3>
