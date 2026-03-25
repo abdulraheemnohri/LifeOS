@@ -225,7 +225,12 @@ const SettingsComponent = {
     },
     clearLocalCache: () => {
         if (!confirm('Clear all local data? This will re-pull everything from the server.')) return;
-        const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'tasks', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields'];
+        const tables = [
+            'income', 'bills', 'loans', 'notes', 'experience', 'tasks',
+            'wifi_clients', 'wifi_payments', 'billing_types', 'categories',
+            'bill_categories', 'bill_category_fields', 'budgets',
+            'groceries', 'utilities', 'habits', 'habit_logs', 'secrets'
+        ];
         tables.forEach(t => localStorage.removeItem(`lifeos_${t}`));
         localStorage.removeItem('lifeos_last_sync_time');
         alert('Cache cleared.');

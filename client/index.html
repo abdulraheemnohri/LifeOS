@@ -67,6 +67,7 @@
                     <button onclick="showSection('bills'); setTimeout(()=>BillsComponent.add(),100); toggleFab()">🧾 Bill</button>
                     <button onclick="showSection('notes'); setTimeout(()=>NotesComponent.add(),100); toggleFab()">📝 Note</button>
                     <button onclick="showSection('tasks'); setTimeout(()=>TasksComponent.add(),100); toggleFab()">✅ Task</button>
+                    <button onclick="showSection('groceries'); setTimeout(()=>GroceryComponent.add(),100); toggleFab()">🛒 Grocery</button>
                 </div>
             </div>
 
@@ -78,6 +79,10 @@
                 <button onclick="showSection('loans')">🤝 Loans</button>
                 <button onclick="showSection('notes')">📝 Notes</button>
                 <button onclick="showSection('tasks')">✅ Tasks</button>
+                <button onclick="showSection('habits')">🔥 Habits</button>
+                <button onclick="showSection('groceries')">🛒 Grocery</button>
+                <button onclick="showSection('utilities')">🔌 Utility</button>
+                <button onclick="showSection('secrets')">🔐 Secrets</button>
                 <button onclick="showSection('experience')">📘 Experience</button>
                 <div class="nav-spacer"></div>
                 <button onclick="showSection('profile')">👤 Profile</button>
@@ -120,6 +125,10 @@
                     <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <button onclick="showSection('bills'); toggleMoreMenu()">🧾 Bills</button>
                         <button onclick="showSection('loans'); toggleMoreMenu()">🤝 Loans</button>
+                    <button onclick="showSection('habits'); toggleMoreMenu()">🔥 Habits</button>
+                    <button onclick="showSection('groceries'); toggleMoreMenu()">🛒 Grocery</button>
+                    <button onclick="showSection('utilities'); toggleMoreMenu()">🔌 Utility</button>
+                    <button onclick="showSection('secrets'); toggleMoreMenu()">🔐 Secrets</button>
                         <button onclick="showSection('experience'); toggleMoreMenu()">📘 Timeline</button>
                         <button onclick="showSection('profile'); toggleMoreMenu()">👤 Profile</button>
                         <button onclick="showSection('settings'); toggleMoreMenu()">⚙️ Settings</button>
@@ -155,6 +164,10 @@
     <script src="components/profile.js"></script>
     <script src="components/settings.js"></script>
     <script src="components/wifi.js"></script>
+    <script src="components/groceries.js"></script>
+    <script src="components/utilities.js"></script>
+    <script src="components/habits.js"></script>
+    <script src="components/secrets.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

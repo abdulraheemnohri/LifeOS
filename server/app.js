@@ -8,6 +8,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve client files
+app.use(express.static(path.join(__dirname, '../client')));
+
 // Serve admin panel as static files
 app.use('/admin-panel', express.static(path.join(__dirname, 'admin-panel')));
 
