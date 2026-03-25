@@ -28,7 +28,12 @@ db.serialize(() => {
 
   // Common tables with data structure:
   // id TEXT PRIMARY KEY, user_id INTEGER, created_at TEXT, updated_at TEXT, synced INTEGER
-  const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'tasks', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields', 'budgets'];
+  const tables = [
+    'income', 'bills', 'loans', 'notes', 'experience', 'tasks',
+    'wifi_clients', 'wifi_payments', 'billing_types', 'categories',
+    'bill_categories', 'bill_category_fields', 'budgets',
+    'groceries', 'utilities', 'habits', 'habit_logs', 'secrets'
+  ];
 
   tables.forEach(table => {
     let columns = `
@@ -64,6 +69,16 @@ db.serialize(() => {
       columns += `, category_id TEXT, field_name TEXT, field_type TEXT, field_order INTEGER`;
     } else if (table === 'budgets') {
       columns += `, category TEXT, amount REAL`;
+    } else if (table === 'groceries') {
+      columns += `, name TEXT, category TEXT, quantity TEXT, unit TEXT, price REAL, bought INTEGER DEFAULT 0, recurring INTEGER DEFAULT 0`;
+    } else if (table === 'utilities') {
+      columns += `, name TEXT, provider TEXT, account_no TEXT, meter_reading REAL, unit TEXT, last_bill_date TEXT, note TEXT`;
+    } else if (table === 'habits') {
+      columns += `, name TEXT, icon TEXT, color TEXT, target_days TEXT, goal_value REAL, unit TEXT, type TEXT`;
+    } else if (table === 'habit_logs') {
+      columns += `, habit_id TEXT, date TEXT, value REAL, status TEXT`;
+    } else if (table === 'secrets') {
+      columns += `, title TEXT, username TEXT, encrypted_content TEXT, category TEXT, icon TEXT`;
     }
 
     db.run(`CREATE TABLE IF NOT EXISTS ${table} (${columns})`, (err) => {

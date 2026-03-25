@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check for updates every hour
     setInterval(checkUpdate, 3600000);
-    // checkUpdate(); // Disable auto-check on load for verification ease
+    checkUpdate();
 
     // DEBUG: Ensure login persists for testing
     if (localStorage.getItem('lifeos_token')) {
@@ -266,6 +266,10 @@ function renderCurrentSection() {
         case 'experience': area.innerHTML = ExperienceComponent.render(); break;
         case 'tasks': area.innerHTML = TasksComponent.render(); break;
         case 'wifi': area.innerHTML = WiFiComponent.render(); break;
+        case 'groceries': area.innerHTML = GroceryComponent.render(); break;
+        case 'utilities': area.innerHTML = UtilityComponent.render(); break;
+        case 'habits': area.innerHTML = HabitsComponent.render(); break;
+        case 'secrets': area.innerHTML = SecretsComponent.render(); break;
         case 'profile': area.innerHTML = ProfileComponent.render(); break;
         case 'settings': area.innerHTML = SettingsComponent.render(); break;
     }

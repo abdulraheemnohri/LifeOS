@@ -518,3 +518,304 @@ button:active {
     left: 31px;
     margin-left: -3px;
 }
+
+/* Grocery Styles */
+.grocery-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.grocery-category-group h3 {
+    margin-bottom: 1rem;
+    color: var(--accent);
+    font-size: 1.2rem;
+    border-left: 4px solid var(--accent);
+    padding-left: 1rem;
+}
+
+.grocery-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.grocery-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    transition: 0.3s;
+}
+
+.grocery-item.bought {
+    opacity: 0.6;
+}
+
+.grocery-item.bought .item-name {
+    text-decoration: line-through;
+}
+
+.grocery-item .item-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    flex-grow: 1;
+}
+
+.checkbox {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--glass-border);
+    border-radius: 6px;
+    transition: 0.2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox.checked {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.checkbox.checked::after {
+    content: '✓';
+    color: white;
+    font-weight: bold;
+}
+
+.item-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.item-meta {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.item-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    background: rgba(255,255,255,0.05);
+    padding: 0.5rem;
+    border-radius: 8px;
+    box-shadow: none;
+    text-transform: none;
+}
+
+.btn-icon:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.btn-icon.danger:hover {
+    background: var(--danger);
+}
+
+/* Utility Styles */
+.utility-card h3 {
+    margin-bottom: 0.2rem;
+    font-size: 1.4rem;
+}
+
+.utility-card .badge {
+    background: var(--accent);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.utility-content {
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.utility-content .detail {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 0.4rem;
+}
+
+.utility-content .label {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.utility-content .value {
+    font-weight: 600;
+}
+
+.utility-note {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    background: rgba(0,0,0,0.2);
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.card-actions button {
+    flex: 1;
+    font-size: 0.7rem;
+    padding: 0.6rem;
+}
+
+/* Habit Styles */
+.habit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.habit-card {
+    border-left: 6px solid var(--primary);
+    padding: 1.5rem;
+}
+
+.habit-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+
+.habit-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.habit-info {
+    flex-grow: 1;
+}
+
+.habit-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+}
+
+.habit-goal {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.habit-check-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: 0.3s;
+    flex-shrink: 0;
+}
+
+.habit-check-btn.checked {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.habit-progress-bg {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.habit-progress-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.habit-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.habit-footer .streak {
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.habit-footer .actions {
+    display: flex;
+    gap: 0.2rem;
+}
+
+/* Secrets Styles */
+.secret-card h3 {
+    margin-bottom: 0.2rem;
+    font-size: 1.2rem;
+}
+
+.secret-card .icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.secret-body {
+    margin: 1.2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.secret-body .detail {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 0.4rem;
+}
+
+.secret-body .label {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.secret-body .value {
+    font-family: monospace;
+    font-size: 0.95rem;
+    word-break: break-all;
+}
+
+.secret-card .card-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+.secret-card .card-actions button {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+}

@@ -15,7 +15,12 @@ const ASSETS = [
     '/components/experience.js',
     '/components/profile.js',
     '/components/settings.js',
-    '/components/wifi.js'
+    '/components/wifi.js',
+    '/components/tasks.js',
+    '/components/groceries.js',
+    '/components/utilities.js',
+    '/components/habits.js',
+    '/components/secrets.js'
 ];
 
 self.addEventListener('install', (event) => {
