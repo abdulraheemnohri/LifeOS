@@ -17,7 +17,16 @@ const Notifications = {
     }
 };
 
+function initTheme() {
+    const theme = localStorage.getItem('lifeos_accent_color') || '#22c55e';
+    const root = document.documentElement;
+    root.style.setProperty('--primary', theme);
+    // Dynamic glow calculation (lighter version of theme)
+    root.style.setProperty('--glow-primary', theme + '66'); // 40% opacity hex
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     // Add notification container
     const notifyDiv = document.createElement('div');
     notifyDiv.id = 'notification-container';
@@ -221,7 +230,18 @@ function showSection(section) {
     const activeBtn = document.getElementById(`nav-${section}`);
     if (activeBtn) activeBtn.classList.add('active');
 
+    // Update active state in desktop nav
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    const activeLink = document.getElementById(`desk-nav-${section}`);
+    if (activeLink) activeLink.classList.add('active');
+
     renderCurrentSection();
+}
+
+function toggleMoreMenuDesktop() {
+    toggleMoreMenu();
 }
 
 function formatCurrency(amount) {

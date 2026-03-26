@@ -7,18 +7,25 @@ const Sync = {
         const lastGenerated = localStorage.getItem('lifeos_recurring_last_gen');
 
         if (lastGenerated !== currentMonth) {
-            // Clone recurring income
+            // Clone recurring income - clones are NOT recurring themselves to avoid exponential duplication
             const incomes = Storage.getData('income');
             incomes.filter(i => i.is_recurring && i.date.substring(0, 7) < currentMonth).forEach(i => {
-                const newId = 'inc-' + Date.now() + Math.random();
-                Storage.saveData('income', { ...i, id: newId, date: currentMonth + i.date.substring(7) });
+                // Only clone if an instance for the current month doesn't already exist from this "parent"
+                const exists = incomes.find(item => item.name === i.name && item.date.substring(0, 7) === currentMonth);
+                if (!exists) {
+                    const newId = 'inc-' + Date.now() + Math.random();
+                    Storage.saveData('income', { ...i, id: newId, date: currentMonth + i.date.substring(7), is_recurring: false });
+                }
             });
 
-            // Clone recurring bills
+            // Clone recurring bills - clones are NOT recurring themselves
             const bills = Storage.getData('bills');
             bills.filter(b => b.is_recurring && b.date.substring(0, 7) < currentMonth).forEach(b => {
-                const newId = 'bill-' + Date.now() + Math.random();
-                Storage.saveData('bills', { ...b, id: newId, date: currentMonth + b.date.substring(7) });
+                const exists = bills.find(item => item.name === b.name && item.date.substring(0, 7) === currentMonth);
+                if (!exists) {
+                    const newId = 'bill-' + Date.now() + Math.random();
+                    Storage.saveData('bills', { ...b, id: newId, date: currentMonth + b.date.substring(7), is_recurring: false });
+                }
             });
 
             localStorage.setItem('lifeos_recurring_last_gen', currentMonth);

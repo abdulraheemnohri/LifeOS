@@ -86,5 +86,33 @@ const Storage = {
             }
         });
         localStorage.setItem(`lifeos_${table}`, JSON.stringify(localData));
+    },
+
+    importData: (table, importedArray) => {
+        const localData = Storage.getData(table, true);
+        let count = 0;
+        importedArray.forEach(newItem => {
+            if (!newItem.id) {
+                newItem.id = table.substring(0, 2) + '-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+            }
+            const lIndex = localData.findIndex(lItem => lItem.id === newItem.id);
+
+            newItem.updated_at = newItem.updated_at || new Date().toISOString();
+            newItem.synced = 0;
+            newItem.deleted = newItem.deleted || 0;
+
+            if (lIndex > -1) {
+                // Merge logic: only update if newer
+                if (new Date(newItem.updated_at) > new Date(localData[lIndex].updated_at)) {
+                    localData[lIndex] = { ...localData[lIndex], ...newItem };
+                    count++;
+                }
+            } else {
+                localData.push(newItem);
+                count++;
+            }
+        });
+        localStorage.setItem(`lifeos_${table}`, JSON.stringify(localData));
+        return count;
     }
 };
