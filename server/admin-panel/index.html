@@ -70,10 +70,15 @@
                     <button onclick="saveSysSettings()">Save Settings</button>
                 </div>
 
-                <h3>Database Backup</h3>
+                <h3>Database Management</h3>
                 <div class="card">
                     <p>Download the current SQLite database file.</p>
                     <button onclick="downloadDB()">Download database.sqlite</button>
+                </div>
+                <div class="card" style="margin-top:1rem;">
+                    <h4>Storage Purge</h4>
+                    <p style="font-size:0.8rem; color:var(--text-muted)">Permanently delete all records marked as "deleted" that have already been synced to clients.</p>
+                    <button onclick="purgeStorage()" class="btn-danger" style="background:var(--danger)">Purge Synced Deletions</button>
                 </div>
             </div>
 

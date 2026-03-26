@@ -29,14 +29,34 @@ const SettingsComponent = {
 
                 <div class="card" style="margin-top: 2rem;">
                     <h3>Display Settings</h3>
-                    <p>Primary Currency</p>
-                    <select id="setting-currency">
-                        <option value="USD" ${localStorage.getItem('lifeos_currency') === 'USD' ? 'selected' : ''}>USD ($)</option>
-                        <option value="PKR" ${localStorage.getItem('lifeos_currency') === 'PKR' ? 'selected' : ''}>PKR (Rs.)</option>
-                        <option value="EUR" ${localStorage.getItem('lifeos_currency') === 'EUR' ? 'selected' : ''}>EUR (€)</option>
-                        <option value="GBP" ${localStorage.getItem('lifeos_currency') === 'GBP' ? 'selected' : ''}>GBP (£)</option>
-                    </select>
-                    <button onclick="SettingsComponent.saveCurrency()">Save Currency Preference</button>
+                    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <p>Primary Currency</p>
+                            <select id="setting-currency">
+                                <option value="USD" ${localStorage.getItem('lifeos_currency') === 'USD' ? 'selected' : ''}>USD ($)</option>
+                                <option value="PKR" ${localStorage.getItem('lifeos_currency') === 'PKR' ? 'selected' : ''}>PKR (Rs.)</option>
+                                <option value="EUR" ${localStorage.getItem('lifeos_currency') === 'EUR' ? 'selected' : ''}>EUR (€)</option>
+                                <option value="GBP" ${localStorage.getItem('lifeos_currency') === 'GBP' ? 'selected' : ''}>GBP (£)</option>
+                            </select>
+                            <button onclick="SettingsComponent.saveCurrency()" style="width:100%">Save Currency</button>
+                        </div>
+                        <div>
+                            <p>Accent Theme Color</p>
+                            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
+                                ${['#22c55e', '#38bdf8', '#8b5cf6', '#f43f5e', '#f59e0b', '#ec4899', '#06b6d4'].map(color => `
+                                    <div onclick="SettingsComponent.setTheme('${color}')"
+                                         style="width:32px; height:32px; border-radius:50%; background:${color}; cursor:pointer;
+                                                border:2px solid ${localStorage.getItem('lifeos_accent_color') === color ? 'white' : 'transparent'};
+                                                box-shadow: 0 4px 10px ${color}44;">
+                                    </div>
+                                `).join('')}
+                                <input type="color" id="custom-theme" value="${localStorage.getItem('lifeos_accent_color') || '#22c55e'}"
+                                       onchange="SettingsComponent.setTheme(this.value)"
+                                       style="width:32px; height:32px; padding:0; border:none; border-radius:50%; background:none; cursor:pointer;">
+                            </div>
+                            <p style="font-size:0.75rem; color:var(--text-muted)">Select a color to update the app theme.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card" style="margin-top: 2rem;">
@@ -159,10 +179,28 @@ const SettingsComponent = {
                 <div class="card" style="margin-top: 2rem;">
                     <h3>Data Management</h3>
                     <p>Local Cache Usage: ~${(JSON.stringify(localStorage).length / 1024).toFixed(2)} KB</p>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+
+                    <h4>Export Data</h4>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-bottom: 1rem;">
                         <button onclick="SettingsComponent.exportCSV('income')" style="background:var(--primary)">Export Income CSV</button>
                         <button onclick="SettingsComponent.exportCSV('bills')" style="background:var(--danger)">Export Expense CSV</button>
+                        <button onclick="SettingsComponent.exportJSON()" class="btn-secondary" style="grid-column: span 2">Export All as JSON</button>
                     </div>
+
+                    <h4>Import Data</h4>
+                    <div style="margin-bottom: 1rem; background:rgba(255,255,255,0.05); padding:1rem; border-radius:12px;">
+                        <p style="font-size:0.8rem; margin-bottom:0.5rem;">Upload JSON or CSV to import/merge data.</p>
+                        <input type="file" id="import-file" accept=".json,.csv" style="margin-bottom:0.5rem;">
+                        <select id="import-table" style="margin-bottom:0.5rem;">
+                            <option value="auto">Auto-Detect (JSON only)</option>
+                            <option value="income">Income</option>
+                            <option value="bills">Bills</option>
+                            <option value="tasks">Tasks</option>
+                            <option value="notes">Notes</option>
+                        </select>
+                        <button onclick="SettingsComponent.handleImport()" style="width:100%">Import Selected File</button>
+                    </div>
+
                     <button onclick="SettingsComponent.clearLocalCache()" style="background:var(--danger); margin-top:1rem;">Clear Local Cache (Except Auth)</button>
                     <p style="color:var(--danger); font-size: 0.8rem;">* This will not delete data from the server.</p>
                 </div>
@@ -185,7 +223,7 @@ const SettingsComponent = {
         location.reload();
     },
     addCat: (type) => {
-        const inputId = type === 'Income' ? 'new-cat-income' : 'new-cat-expense';
+        const inputId = type.toLowerCase() === 'income' ? 'new-cat-income' : 'new-cat-expense';
         const name = document.getElementById(inputId).value;
         if (!name) return;
         Storage.saveData('categories', { id: 'cat-' + Date.now(), name, type });
@@ -201,7 +239,13 @@ const SettingsComponent = {
     saveCurrency: () => {
         const val = document.getElementById('setting-currency').value;
         localStorage.setItem('lifeos_currency', val);
-        alert('Currency preference saved.');
+        Notifications.show('Currency preference saved.');
+        renderCurrentSection();
+    },
+    setTheme: (color) => {
+        localStorage.setItem('lifeos_accent_color', color);
+        initTheme(); // Re-apply theme immediately
+        Notifications.show('Theme updated successfully.');
         renderCurrentSection();
     },
     saveLocalPass: () => {
@@ -238,7 +282,7 @@ const SettingsComponent = {
     },
     exportCSV: (table) => {
         const data = Storage.getData(table);
-        if (data.length === 0) return alert('No data to export');
+        if (data.length === 0) return Notifications.show('No data to export', 'error');
 
         const headers = Object.keys(data[0]).join(',');
         const rows = data.map(item => Object.values(item).map(val => `"${val}"`).join(','));
@@ -251,6 +295,69 @@ const SettingsComponent = {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    },
+    exportJSON: () => {
+        const tables = [
+            'income', 'bills', 'loans', 'notes', 'experience', 'tasks',
+            'wifi_clients', 'wifi_payments', 'billing_types', 'categories',
+            'bill_categories', 'bill_category_fields', 'budgets',
+            'groceries', 'utilities', 'habits', 'habit_logs', 'secrets'
+        ];
+        const allData = {};
+        tables.forEach(t => allData[t] = Storage.getData(t, true));
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
+        const link = document.createElement("a");
+        link.setAttribute("href", dataStr);
+        link.setAttribute("download", `lifeos_full_backup_${new Date().toISOString().split('T')[0]}.json`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    },
+    handleImport: () => {
+        const fileInput = document.getElementById('import-file');
+        const table = document.getElementById('import-table').value;
+        if (!fileInput.files.length) return Notifications.show('Please select a file', 'error');
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            try {
+                if (file.name.endsWith('.json')) {
+                    const data = JSON.parse(content);
+                    if (table === 'auto') {
+                        // Multi-table import
+                        let totalCount = 0;
+                        Object.keys(data).forEach(t => {
+                            totalCount += Storage.importData(t, data[t]);
+                        });
+                        Notifications.show(`Imported ${totalCount} items across multiple tables`);
+                    } else {
+                        const count = Storage.importData(table, Array.isArray(data) ? data : data[table]);
+                        Notifications.show(`Imported ${count} items to ${table}`);
+                    }
+                } else if (file.name.endsWith('.csv')) {
+                    if (table === 'auto') return Notifications.show('CSV requires a target table', 'error');
+                    const rows = content.split('\n');
+                    const headers = rows[0].split(',');
+                    const data = rows.slice(1).filter(r => r.trim()).map(row => {
+                        const values = row.split(',').map(v => v.replace(/^"|"$/g, ''));
+                        const obj = {};
+                        headers.forEach((h, i) => obj[h.trim()] = values[i]);
+                        return obj;
+                    });
+                    const count = Storage.importData(table, data);
+                    Notifications.show(`Imported ${count} items from CSV`);
+                }
+                Sync.performSync();
+                renderCurrentSection();
+            } catch (err) {
+                console.error(err);
+                Notifications.show('Error parsing file', 'error');
+            }
+        };
+        reader.readAsText(file);
     },
     saveBudget: (catId, catName) => {
         const amount = document.getElementById(`budget-val-${catId}`).value;

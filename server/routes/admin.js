@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const db = require('../db');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
+const Audit = require('../services/auditService');
+const path = require('path');
 
 // All admin routes require authentication and admin role
 router.use(auth, admin);
@@ -36,6 +38,7 @@ router.post('/create-user', (req, res) => {
           }
           return res.status(500).json({ message: 'Server error' });
         }
+        Audit.log(req.user.id, 'CREATE_USER', `Created new user: ${username} (${role || 'user'})`, req.ip);
         res.status(201).json({ id: this.lastID, username, role: role || 'user' });
       }
     );
@@ -46,6 +49,7 @@ router.post('/create-user', (req, res) => {
 router.delete('/user/:id', (req, res) => {
   db.run('DELETE FROM users WHERE id = ?', [req.params.id], function(err) {
     if (err) return res.status(500).json({ message: 'Server error' });
+    Audit.log(req.user.id, 'DELETE_USER', `Deleted user with ID: ${req.params.id}`, req.ip);
     res.json({ message: 'User deleted' });
   });
 });
@@ -73,19 +77,42 @@ router.post('/reset-password', (req, res) => {
 
 // GET /api/admin/backup
 router.get('/backup', (req, res) => {
-  const dbFile = require('../config/config').DB_PATH;
+  const dbFile = path.resolve(__dirname, '..', require('../config/config').DB_PATH);
   res.download(dbFile);
+});
+
+// POST /api/admin/purge
+router.post('/purge', (req, res) => {
+    const tables = ['income', 'bills', 'loans', 'notes', 'experience', 'tasks', 'wifi_clients', 'wifi_payments', 'billing_types', 'categories', 'bill_categories', 'bill_category_fields', 'budgets', 'groceries', 'utilities', 'habits', 'habit_logs', 'secrets'];
+
+    let completed = 0;
+    let totalPurged = 0;
+
+    tables.forEach(table => {
+        db.run(`DELETE FROM ${table} WHERE deleted = 1 AND synced = 1`, [], function(err) {
+            completed++;
+            totalPurged += this.changes;
+
+            if (completed === tables.length) {
+                Audit.log(req.user.id, 'PURGE_RECORDS', `Permanently purged ${totalPurged} deleted/synced records across all tables`, req.ip);
+                res.json({ message: 'Purge complete', purged: totalPurged });
+            }
+        });
+    });
 });
 
 // GET /api/admin/logs
 router.get('/logs', (req, res) => {
-  // Simple mock logs
-  const logs = [
-    { timestamp: new Date().toISOString(), message: 'User admin logged in' },
-    { timestamp: new Date().toISOString(), message: 'Sync push from user 1: 5 items' },
-    { timestamp: new Date().toISOString(), message: 'New user created: test_user' }
-  ];
-  res.json(logs);
+  db.all(`
+    SELECT l.*, u.username
+    FROM audit_logs l
+    LEFT JOIN users u ON l.user_id = u.id
+    ORDER BY l.created_at DESC
+    LIMIT 100
+  `, [], (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Server error' });
+    res.json(rows);
+  });
 });
 
 module.exports = router;

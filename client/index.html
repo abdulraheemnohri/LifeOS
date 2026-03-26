@@ -73,21 +73,21 @@
 
             <nav class="glass-nav desktop-nav">
                 <div class="logo-small">🚀 LifeOS</div>
-                <button onclick="showSection('dashboard')">📊 Dashboard</button>
-                <button onclick="showSection('income')">💰 Income</button>
-                <button onclick="showSection('bills')">🧾 Bills</button>
-                <button onclick="showSection('loans')">🤝 Loans</button>
-                <button onclick="showSection('notes')">📝 Notes</button>
-                <button onclick="showSection('tasks')">✅ Tasks</button>
-                <button onclick="showSection('habits')">🔥 Habits</button>
-                <button onclick="showSection('groceries')">🛒 Grocery</button>
-                <button onclick="showSection('utilities')">🔌 Utility</button>
-                <button onclick="showSection('secrets')">🔐 Secrets</button>
-                <button onclick="showSection('experience')">📘 Experience</button>
+                <div class="nav-links">
+                    <a href="#" class="nav-link" id="desk-nav-dashboard" onclick="showSection('dashboard')">📊 Dashboard</a>
+                    <a href="#" class="nav-link" id="desk-nav-income" onclick="showSection('income')">💰 Income</a>
+                    <a href="#" class="nav-link" id="desk-nav-bills" onclick="showSection('bills')">🧾 Bills</a>
+                    <a href="#" class="nav-link" id="desk-nav-tasks" onclick="showSection('tasks')">✅ Tasks</a>
+                    <a href="#" class="nav-link" id="desk-nav-notes" onclick="showSection('notes')">📝 Notes</a>
+                    <a href="#" class="nav-link" id="desk-nav-habits" onclick="showSection('habits')">🔥 Habits</a>
+                </div>
                 <div class="nav-spacer"></div>
-                <button onclick="showSection('profile')">👤 Profile</button>
-                <button onclick="showSection('settings')">⚙️ Settings</button>
-                <button onclick="logout()">🚪 Logout</button>
+                <div class="nav-actions">
+                    <button class="btn-icon" onclick="toggleMoreMenuDesktop()" title="More Modules">➕</button>
+                    <button class="btn-icon" onclick="showSection('profile')" title="Profile">👤</button>
+                    <button class="btn-icon" onclick="showSection('settings')" title="Settings">⚙️</button>
+                    <button class="btn-icon danger" onclick="logout()" title="Logout">🚪</button>
+                </div>
             </nav>
 
             <div id="content-area">

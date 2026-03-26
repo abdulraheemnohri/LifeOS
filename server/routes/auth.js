@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('../db');
 const config = require('../config/config');
+const Audit = require('../services/auditService');
 
 // POST /api/auth/login
 router.post('/login', (req, res) => {
@@ -25,6 +26,8 @@ router.post('/login', (req, res) => {
         config.JWT_SECRET,
         { expiresIn: '30d' }
       );
+
+      Audit.log(user.id, 'LOGIN', 'User logged in successfully', req.ip);
 
       res.json({
         token,

@@ -26,6 +26,15 @@ db.serialize(() => {
       }
     });
 
+  db.run(`CREATE TABLE IF NOT EXISTS audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    action TEXT,
+    details TEXT,
+    ip_address TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   // Common tables with data structure:
   // id TEXT PRIMARY KEY, user_id INTEGER, created_at TEXT, updated_at TEXT, synced INTEGER
   const tables = [
@@ -45,8 +54,10 @@ db.serialize(() => {
       deleted INTEGER DEFAULT 0
     `;
 
-    if (table === 'income' || table === 'bills') {
+    if (table === 'income') {
       columns += `, name TEXT, amount REAL, date TEXT, category TEXT, category_id TEXT, dynamic_data TEXT, note TEXT, is_recurring INTEGER DEFAULT 0`;
+    } else if (table === 'bills') {
+      columns += `, name TEXT, amount REAL, date TEXT, category TEXT, category_id TEXT, dynamic_data TEXT, note TEXT, is_recurring INTEGER DEFAULT 0, archived INTEGER DEFAULT 0`;
     } else if (table === 'loans') {
       columns += `, person TEXT, amount REAL, type TEXT, date TEXT, status TEXT, note TEXT`;
     } else if (table === 'notes') {
@@ -54,7 +65,7 @@ db.serialize(() => {
     } else if (table === 'experience') {
       columns += `, title TEXT, description TEXT, date TEXT, rating INTEGER, location TEXT, media_url TEXT, tags TEXT`;
     } else if (table === 'tasks') {
-      columns += `, title TEXT, priority TEXT, due_date TEXT, completed INTEGER DEFAULT 0`;
+      columns += `, title TEXT, priority TEXT, due_date TEXT, completed INTEGER DEFAULT 0, archived INTEGER DEFAULT 0`;
     } else if (table === 'wifi_clients') {
       columns += `, type_id TEXT, name TEXT, mobile TEXT, imei TEXT, monthly_rate REAL, note TEXT`;
     } else if (table === 'wifi_payments') {
@@ -85,6 +96,13 @@ db.serialize(() => {
       if (!err) {
         db.run(`CREATE INDEX IF NOT EXISTS idx_${table}_user_id ON ${table} (user_id)`);
         db.run(`CREATE INDEX IF NOT EXISTS idx_${table}_updated_at ON ${table} (updated_at)`);
+
+        // Simple migration for 'archived' column
+        if (table === 'bills' || table === 'tasks') {
+            db.run(`ALTER TABLE ${table} ADD COLUMN archived INTEGER DEFAULT 0`, (err) => {
+                // Ignore error if column already exists
+            });
+        }
       }
     });
   });

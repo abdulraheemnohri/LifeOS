@@ -20,13 +20,18 @@ const updateService = {
       }
 
       console.log(stdout);
-      res.json({ message: 'Server update started. Restarting process...', stdout, stderr });
+      res.json({
+        message: 'Server update started successfully. Restarting process...',
+        stdout,
+        stderr,
+        notice: 'Note: For the server to restart automatically, it should be managed by a process manager like PM2 (e.g., pm2 start app.js --watch).'
+      });
 
-      // Simulated process restart
+      // Restart process
       setTimeout(() => {
-        console.log('Restarting server process...');
+        console.log('Update complete. Restarting server process to apply changes...');
         process.exit(0);
-      }, 1000);
+      }, 3000);
     });
   }
 };

@@ -74,8 +74,11 @@ const DashboardComponent = {
         // Upcoming Bills (Unpaid bills in current month or older)
         const unpaidBills = expenseItems.filter(b => {
             const billMonth = (b.date || "").substring(0, 7);
-            return billMonth <= currentMonth; // Simple heuristic
+            return billMonth <= currentMonth && b.deleted === 0;
         }).slice(-3);
+
+        const pendingTasks = Storage.getData('tasks').filter(t => t.status !== 'Completed' && t.deleted === 0).length;
+        const activeHabits = Storage.getData('habits').filter(h => h.deleted === 0).length;
 
         return `
             <div class="glass-card">
@@ -108,18 +111,28 @@ const DashboardComponent = {
                 </div>
 
                 <div class="grid" style="margin-top: 2rem;">
-                    <div class="card" style="background: linear-gradient(135deg, #22c55e22, transparent); border-left: 5px solid var(--primary)">
-                        <h3>Net Worth</h3>
-                        <p style="font-size: 2rem; color:var(--primary)">${formatCurrency(netWorth)}</p>
+                    <div class="card stat-card" style="background: linear-gradient(135deg, var(--primary)11, transparent); border-left: 5px solid var(--primary)">
+                        <span class="stat-label">Net Worth</span>
+                        <span class="stat-value" style="color:var(--primary)">${formatCurrency(netWorth)}</span>
                         <small style="opacity:0.6">Assets + Loans Given - Loans Taken</small>
                     </div>
-                    <div class="card" style="background: linear-gradient(135deg, #38bdf822, transparent); border-left: 5px solid var(--accent)">
-                        <h3>Monthly Progress</h3>
-                        <p style="font-size: 2rem;">${((expense / (income || 1)) * 100).toFixed(0)}%</p>
+                    <div class="card stat-card" style="background: linear-gradient(135deg, var(--accent)11, transparent); border-left: 5px solid var(--accent)">
+                        <span class="stat-label">Monthly Progress</span>
+                        <span class="stat-value">${((expense / (income || 1)) * 100).toFixed(0)}%</span>
                         <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:0.5rem;">
                             <div style="width:${Math.min((expense / (income || 1)) * 100, 100)}%; height:100%; background:var(--danger); border-radius:4px;"></div>
                         </div>
                         <small style="opacity:0.6">Expense vs Total Income</small>
+                    </div>
+                    <div class="card stat-card" style="background: linear-gradient(135deg, #fbbf2411, transparent); border-left: 5px solid #fbbf24">
+                        <span class="stat-label">Pending Tasks</span>
+                        <span class="stat-value" style="color:#fbbf24">${pendingTasks}</span>
+                        <small style="opacity:0.6">Active tasks across all lists</small>
+                    </div>
+                    <div class="card stat-card" style="background: linear-gradient(135deg, #a855f711, transparent); border-left: 5px solid #a855f7">
+                        <span class="stat-label">Active Habits</span>
+                        <span class="stat-value" style="color:#a855f7">${activeHabits}</span>
+                        <small style="opacity:0.6">Daily goals being tracked</small>
                     </div>
                 </div>
 
@@ -133,11 +146,11 @@ const DashboardComponent = {
                         <h3>Pending</h3>
                         <p style="font-size: 1.5rem;">${formatCurrency(wifiPending)}</p>
                     </div>
-                    <div class="card" style="border-left: 5px solid var(--accent)">
-                        <h3>System Stats</h3>
-                        <div style="display:flex; gap:1rem; margin-top:0.5rem;">
-                            <div><small>Notes:</small> <strong>${totalNotes}</strong></div>
-                            <div><small>Exp:</small> <strong>${totalExp}</strong></div>
+                    <div class="card stat-card" style="border-left: 5px solid var(--accent)">
+                        <span class="stat-label">System Stats</span>
+                        <div style="display:flex; flex-direction:column; gap:0.2rem; margin-top:0.5rem;">
+                            <div><small>Total Notes:</small> <strong>${totalNotes}</strong></div>
+                            <div><small>Exp Entries:</small> <strong>${totalExp}</strong></div>
                         </div>
                     </div>
                 </div>

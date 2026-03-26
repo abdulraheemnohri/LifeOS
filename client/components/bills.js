@@ -1,8 +1,16 @@
 const BillsComponent = {
     render: () => {
         const searchQuery = localStorage.getItem('bills_search') || '';
-        const data = Storage.getData('bills')
-            .filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()) || (b.category || '').toLowerCase().includes(searchQuery.toLowerCase()));
+        const showArchived = localStorage.getItem('bills_show_archived') === 'true';
+        let data = Storage.getData('bills', true).filter(b => b.deleted === 0);
+
+        if (showArchived) {
+            data = data.filter(b => b.archived === 1);
+        } else {
+            data = data.filter(b => b.archived !== 1);
+        }
+
+        data = data.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()) || (b.category || '').toLowerCase().includes(searchQuery.toLowerCase()));
         const categories = Storage.getData('categories').filter(c => c.type === 'expense');
         const billCategories = Storage.getData('bill_categories');
 
@@ -10,10 +18,15 @@ const BillsComponent = {
             <div class="glass-card">
                 <div class="section-header">
                     <h1>🧾 Bills & Expenses</h1>
-                    <button onclick="BillsComponent.add()" style="width: auto;">+ Add Expense</button>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button onclick="BillsComponent.toggleArchivedView()" class="btn-secondary" style="width:auto;">
+                            ${showArchived ? 'View Active' : 'View Archived'}
+                        </button>
+                        <button onclick="BillsComponent.add()" style="width: auto;">+ Add Expense</button>
+                    </div>
                 </div>
                 <div class="card" style="margin-bottom: 2rem;">
-                    <input type="text" placeholder="Search expenses or categories..." value="${searchQuery}" oninput="BillsComponent.search(this.value)" style="margin-bottom:0;">
+                    <input type="text" placeholder="Search ${showArchived ? 'archived' : 'active'} expenses..." value="${searchQuery}" oninput="BillsComponent.search(this.value)" style="margin-bottom:0;">
                 </div>
                 <div id="bill-form" class="card" style="display:none; margin-bottom: 2rem;">
                     <input type="text" id="bill-name" placeholder="Expense Name (e.g. Rent)">
@@ -60,7 +73,12 @@ const BillsComponent = {
                                     ${dynamicInfo || '<em style="opacity:0.5">No dynamic data</em>'}
                                 </div>
                                 ${item.note ? `<p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.7;">${item.note}</p>` : ''}
-                                <button onclick="BillsComponent.delete('${item.id}')" class="delete-btn" style="width:auto; margin-top:1rem;">Delete</button>
+                                <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                                    <button onclick="BillsComponent.toggleArchive('${item.id}')" class="btn-secondary" style="flex:1;">
+                                        ${item.archived ? '📤 Restore' : '📥 Archive'}
+                                    </button>
+                                    <button onclick="BillsComponent.delete('${item.id}')" class="btn-danger" style="flex:1;">Delete</button>
+                                </div>
                             </div>
                         `;
                     }).join('')}
@@ -132,6 +150,21 @@ const BillsComponent = {
     },
     search: (val) => {
         localStorage.setItem('bills_search', val);
+        renderCurrentSection();
+    },
+    toggleArchive: (id) => {
+        const bills = Storage.getData('bills', true);
+        const bill = bills.find(b => b.id === id);
+        if (bill) {
+            bill.archived = bill.archived ? 0 : 1;
+            Storage.saveData('bills', bill);
+            renderCurrentSection();
+            Sync.performSync();
+        }
+    },
+    toggleArchivedView: () => {
+        const current = localStorage.getItem('bills_show_archived') === 'true';
+        localStorage.setItem('bills_show_archived', !current);
         renderCurrentSection();
     }
 };

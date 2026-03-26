@@ -146,12 +146,30 @@ function downloadDB() {
   document.body.removeChild(link);
 }
 
+async function purgeStorage() {
+  if (!confirm('This will PERMANENTLY delete records from the server that are marked as deleted. Continue?')) return;
+  const res = await fetch('/api/admin/purge', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  const data = await res.json();
+  alert(`Purge complete. Records removed: ${data.purged}`);
+  refreshLogs();
+}
+
 async function refreshLogs() {
   const res = await fetch('/api/admin/logs', {
     headers: { 'Authorization': `Bearer ${token}` }
   });
   const logs = await res.json();
   const container = document.getElementById('logs-container');
-  container.innerHTML = logs.map(l => `<div>[${l.timestamp}] ${l.message}</div>`).join('');
-  container.scrollTop = container.scrollHeight;
+  container.innerHTML = logs.map(l => `
+    <div style="padding:0.5rem; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.8rem;">
+      <span style="color:var(--accent)">[${l.created_at}]</span>
+      <strong style="color:var(--primary)">${l.username || 'System'}:</strong>
+      <span>${l.action}</span> - ${l.details}
+      <small style="opacity:0.5">(${l.ip_address})</small>
+    </div>
+  `).join('');
+  container.scrollTop = 0;
 }
